@@ -113,11 +113,11 @@ import { RouterLink } from "@angular/router";
           Ready to get started?
         </h2>
         <p class="text-xl text-slate-400 mb-8">
-          Set up your LLM provider and start building in minutes.
+          <p>
+            Clone or fork our github repository - Or just use this
+            website.
+          </p>
         </p>
-        <a routerLink="/settings" class="btn-primary text-lg py-3 px-8">
-          Get Started Now
-        </a>
       </div>
     </section>
   `,
