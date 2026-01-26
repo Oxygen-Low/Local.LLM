@@ -1,0 +1,92 @@
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+
+@Component({
+  selector: "app-auth",
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 px-4">
+      <!-- Animated Background Elements -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl opacity-20"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-secondary/10 rounded-full filter blur-3xl opacity-20"></div>
+      </div>
+
+      <!-- Auth Card -->
+      <div class="relative z-10 w-full max-w-md">
+        <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-2xl p-8 shadow-2xl">
+          <!-- Header -->
+          <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-slate-100 mb-2">Welcome Back</h1>
+            <p class="text-slate-400">Sign in to your account</p>
+          </div>
+
+          <!-- Form -->
+          <form (ngSubmit)="onSubmit()" class="space-y-6">
+            <!-- Username Field -->
+            <div>
+              <label for="username" class="block text-sm font-medium text-slate-300 mb-2">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                [(ngModel)]="username"
+                name="username"
+                class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
+
+            <!-- Password Field -->
+            <div>
+              <label for="password" class="block text-sm font-medium text-slate-300 mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                [(ngModel)]="password"
+                name="password"
+                class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+            >
+              Sign In
+            </button>
+          </form>
+
+          <!-- Message -->
+          <div *ngIf="message" class="mt-6 p-4 bg-slate-700/50 rounded-lg border border-slate-600">
+            <p class="text-slate-300 text-sm text-center">{{ message }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+})
+export class AuthComponent {
+  username = "";
+  password = "";
+  message = "";
+
+  onSubmit() {
+    if (!this.username || !this.password) {
+      this.message = "Please fill in all fields";
+      return;
+    }
+
+    // Placeholder authentication logic
+    this.message = `Login attempt: ${this.username}`;
+  }
+}
