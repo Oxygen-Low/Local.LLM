@@ -113,8 +113,7 @@ import { RouterLink } from "@angular/router";
           Ready to get started?
         </h2>
         <p class="text-xl text-slate-400 mb-8">
-          Clone or fork our github repository - Or just use this
-          website.
+          Clone or fork our github repository - Or just use this website.
         </p>
       </div>
     </section>
@@ -131,8 +130,7 @@ export class HomeComponent {
     {
       icon: "⚡",
       title: "Large Model Selection",
-      description:
-        "Pick any model from any provider.",
+      description: "Pick any model from any provider.",
     },
     {
       icon: "🔒",
@@ -155,8 +153,7 @@ export class HomeComponent {
     {
       icon: "🧩",
       title: "Rich App Ecosystem",
-      description:
-        "Discover apps, many for different purposes.",
+      description: "Discover apps, many for different purposes.",
     },
   ];
 }

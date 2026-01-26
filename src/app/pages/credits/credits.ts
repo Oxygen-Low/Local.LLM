@@ -39,7 +39,6 @@ interface DailyLimit {
           <p class="text-slate-300 text-lg mb-8">
             Reset in <span class="font-semibold">8 days</span>
           </p>
-
         </div>
 
         <!-- Daily/Weekly Limits -->
@@ -184,10 +183,9 @@ interface DailyLimit {
                 How are credits calculated?
               </h3>
               <p class="text-slate-400">
-                Each LLM model has different credit limits. Every
-                prompt and mini action uses a credit on the llm's
-                type. (Mini actions refer to actions such as creating
-                a file or editing a file.)
+                Each LLM model has different credit limits. Every prompt and
+                mini action uses a credit on the llm's type. (Mini actions refer
+                to actions such as creating a file or editing a file.)
               </p>
             </div>
 
@@ -206,8 +204,7 @@ interface DailyLimit {
                 What happens if I run out of credits?
               </h3>
               <p class="text-slate-400">
-                You can still use external llm providers such as
-                OpenAI.
+                You can still use external llm providers such as OpenAI.
               </p>
             </div>
           </div>
@@ -218,7 +215,11 @@ interface DailyLimit {
 })
 export class CreditsComponent {
   dailyLimits: DailyLimit[] = [
-    { model: "Fast (Gemma3:4b) + Super Fast (Gemma3:1b)", used: 1500, limit: 2000 },
+    {
+      model: "Fast (Gemma3:4b) + Super Fast (Gemma3:1b)",
+      used: 1500,
+      limit: 2000,
+    },
     { model: "Balanced (Mistral)", used: 450, limit: 800 },
     { model: "Power (nemotron-3-nano:30b)", used: 100, limit: 200 },
   ];
