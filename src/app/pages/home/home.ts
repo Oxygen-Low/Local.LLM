@@ -28,8 +28,7 @@ import { RouterLink } from "@angular/router";
         <div class="animate-fade-in">
           <!-- Main Heading -->
           <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
-            <span class="gradient-text">Local LLM</span>
-            <span class="text-slate-100"> Platform</span>
+            <span class="gradient-text"><p>local.llm</p></span>
           </h1>
 
           <!-- Subheading -->
