@@ -73,8 +73,8 @@ interface Post {
                 <button
                   (click)="createPost()"
                   class="btn-primary"
-                  [disabled]="!newPostContent.trim()"
-                  [class.opacity-50]="!newPostContent.trim()"
+                  [disabled]="!newPostContent().trim()"
+                  [class.opacity-50]="!newPostContent().trim()"
                 >
                   <svg
                     class="w-5 h-5"
@@ -132,7 +132,7 @@ interface Post {
               >
                 <svg
                   class="w-5 h-5"
-                  [fill]="post.isLiked ? 'currentColor' : 'none'"
+                  [attr.fill]="post.isLiked ? 'currentColor' : 'none'"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
