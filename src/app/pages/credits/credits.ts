@@ -187,6 +187,7 @@ interface DailyLimit {
                 Each LLM model has different credit costs. Simple queries cost
                 fewer credits than complex operations. Credits are deducted in
                 real-time when you use an app.
+                Only our self hosted models use credits.
               </p>
             </div>
 
