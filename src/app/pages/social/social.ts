@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 
 interface Post {
   id: string;
@@ -14,11 +14,13 @@ interface Post {
 }
 
 @Component({
-  selector: 'app-social-media-sim',
+  selector: "app-social-media-sim",
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8"
+    >
       <div class="max-w-2xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
@@ -76,12 +78,10 @@ interface Post {
                   [disabled]="!newPostContent().trim()"
                   [class.opacity-50]="!newPostContent().trim()"
                 >
-                  <svg
-                    class="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.488 5.951 1.488a1 1 0 001.16-1.41l-7-14z" />
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.488 5.951 1.488a1 1 0 001.16-1.41l-7-14z"
+                    />
                   </svg>
                   Post
                 </button>
@@ -92,10 +92,7 @@ interface Post {
 
         <!-- Feed -->
         <div class="space-y-4">
-          <div
-            *ngFor="let post of posts"
-            class="card p-6 card-hover"
-          >
+          <div *ngFor="let post of posts" class="card p-6 card-hover">
             <!-- Post Header -->
             <div class="flex items-start gap-4 mb-4">
               <div class="text-3xl flex-shrink-0">{{ post.avatar }}</div>
@@ -103,22 +100,26 @@ interface Post {
                 <p class="font-bold text-slate-100">{{ post.author }}</p>
                 <p class="text-sm text-slate-500">{{ post.timestamp }}</p>
               </div>
-              <button class="text-slate-400 hover:text-slate-100 transition-colors">
-                <svg
-                  class="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+              <button
+                class="text-slate-400 hover:text-slate-100 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"
+                  />
                 </svg>
               </button>
             </div>
 
             <!-- Post Content -->
-            <p class="text-slate-100 mb-4 leading-relaxed">{{ post.content }}</p>
+            <p class="text-slate-100 mb-4 leading-relaxed">
+              {{ post.content }}
+            </p>
 
             <!-- Post Stats -->
-            <div class="flex gap-4 text-sm text-slate-400 mb-4 py-3 border-t border-b border-slate-800">
+            <div
+              class="flex gap-4 text-sm text-slate-400 mb-4 py-3 border-t border-b border-slate-800"
+            >
               <span>{{ post.likes }} likes</span>
               <span>{{ post.comments }} comments</span>
             </div>
@@ -185,10 +186,7 @@ interface Post {
           </div>
 
           <!-- Load More -->
-          <button
-            (click)="loadMorePosts()"
-            class="w-full btn-secondary py-3"
-          >
+          <button (click)="loadMorePosts()" class="w-full btn-secondary py-3">
             Load More Posts
           </button>
         </div>
@@ -197,60 +195,60 @@ interface Post {
   `,
 })
 export class SocialMediaSimComponent {
-  newPostContent = signal('');
+  newPostContent = signal("");
 
   posts: Post[] = [
     {
-      id: '1',
-      author: 'TechVision',
-      avatar: '🤖',
+      id: "1",
+      author: "TechVision",
+      avatar: "🤖",
       content:
-        'Just discovered this amazing local LLM platform! The ability to run models locally while maintaining full privacy is a game-changer for developers. #LocalAI #Privacy',
-      timestamp: '2 hours ago',
+        "Just discovered this amazing local LLM platform! The ability to run models locally while maintaining full privacy is a game-changer for developers. #LocalAI #Privacy",
+      timestamp: "2 hours ago",
       likes: 342,
       comments: 45,
       isLiked: false,
     },
     {
-      id: '2',
-      author: 'CodeMaster',
-      avatar: '👨‍💻',
+      id: "2",
+      author: "CodeMaster",
+      avatar: "👨‍💻",
       content:
-        'Finally built a complete app using local LLMs. No more API rate limits, no latency issues, and everything runs offline. This is the future of AI development.',
-      timestamp: '4 hours ago',
+        "Finally built a complete app using local LLMs. No more API rate limits, no latency issues, and everything runs offline. This is the future of AI development.",
+      timestamp: "4 hours ago",
       likes: 587,
       comments: 123,
       isLiked: false,
     },
     {
-      id: '3',
-      author: 'AIEnthusiast',
-      avatar: '🧠',
+      id: "3",
+      author: "AIEnthusiast",
+      avatar: "🧠",
       content:
-        'The credit system on local.llm is so transparent. Unlike other platforms, I know exactly where my credits are going. Love the detailed breakdown!',
-      timestamp: '6 hours ago',
+        "The credit system on local.llm is so transparent. Unlike other platforms, I know exactly where my credits are going. Love the detailed breakdown!",
+      timestamp: "6 hours ago",
       likes: 201,
       comments: 34,
       isLiked: false,
     },
     {
-      id: '4',
-      author: 'DevCommunity',
-      avatar: '👥',
+      id: "4",
+      author: "DevCommunity",
+      avatar: "👥",
       content:
-        'Building collaborative AI projects has never been easier. The friends feature makes it simple to share models, collaborate, and scale together. #Collaboration #OpenSource',
-      timestamp: '8 hours ago',
+        "Building collaborative AI projects has never been easier. The friends feature makes it simple to share models, collaborate, and scale together. #Collaboration #OpenSource",
+      timestamp: "8 hours ago",
       likes: 456,
       comments: 89,
       isLiked: false,
     },
     {
-      id: '5',
-      author: 'PrivacyFirst',
-      avatar: '🔒',
+      id: "5",
+      author: "PrivacyFirst",
+      avatar: "🔒",
       content:
-        'Security audit complete! All data stays on your machine. No cloud dependency, no surveillance, just pure computational power at your fingertips.',
-      timestamp: '10 hours ago',
+        "Security audit complete! All data stays on your machine. No cloud dependency, no surveillance, just pure computational power at your fingertips.",
+      timestamp: "10 hours ago",
       likes: 678,
       comments: 156,
       isLiked: false,
@@ -262,17 +260,17 @@ export class SocialMediaSimComponent {
 
     const newPost: Post = {
       id: `post-${Date.now()}`,
-      author: 'You',
-      avatar: '👤',
+      author: "You",
+      avatar: "👤",
       content: this.newPostContent(),
-      timestamp: 'just now',
+      timestamp: "just now",
       likes: 0,
       comments: 0,
       isLiked: false,
     };
 
     this.posts.unshift(newPost);
-    this.newPostContent.set('');
+    this.newPostContent.set("");
   }
 
   toggleLike(postId: string): void {
@@ -287,22 +285,22 @@ export class SocialMediaSimComponent {
     const morePosts: Post[] = [
       {
         id: `post-${Date.now()}`,
-        author: 'CreativeDesigner',
-        avatar: '🎨',
+        author: "CreativeDesigner",
+        avatar: "🎨",
         content:
-          'Using the APIs to create something incredible with local LLMs. The possibilities are endless!',
-        timestamp: '12 hours ago',
+          "Using the APIs to create something incredible with local LLMs. The possibilities are endless!",
+        timestamp: "12 hours ago",
         likes: 234,
         comments: 45,
         isLiked: false,
       },
       {
         id: `post-${Date.now() + 1}`,
-        author: 'DataScientist',
-        avatar: '📊',
+        author: "DataScientist",
+        avatar: "📊",
         content:
-          'The performance metrics speak for themselves. Local processing beats cloud every time.',
-        timestamp: '14 hours ago',
+          "The performance metrics speak for themselves. Local processing beats cloud every time.",
+        timestamp: "14 hours ago",
         likes: 567,
         comments: 120,
         isLiked: false,

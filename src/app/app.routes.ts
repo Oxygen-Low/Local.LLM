@@ -1,36 +1,34 @@
-import { Routes } from '@angular/router';
+import { Routes } from "@angular/router";
 
 export const routes: Routes = [
   {
-    path: '',
+    path: "",
     loadComponent: () =>
-      import('./pages/home/home').then((m) => m.HomeComponent),
+      import("./pages/home/home").then((m) => m.HomeComponent),
   },
   {
-    path: 'apps',
+    path: "apps",
     loadComponent: () =>
-      import('./pages/apps/apps').then((m) => m.AppsListComponent),
+      import("./pages/apps/apps").then((m) => m.AppsListComponent),
   },
   {
-    path: 'settings',
+    path: "settings",
     loadComponent: () =>
-      import('./pages/settings/settings').then((m) => m.SettingsComponent),
+      import("./pages/settings/settings").then((m) => m.SettingsComponent),
   },
   {
-    path: 'friends',
+    path: "friends",
     loadComponent: () =>
-      import('./pages/friends/friends').then((m) => m.FriendsListComponent),
+      import("./pages/friends/friends").then((m) => m.FriendsListComponent),
   },
   {
-    path: 'credits',
+    path: "credits",
     loadComponent: () =>
-      import('./pages/credits/credits').then((m) => m.CreditsComponent),
+      import("./pages/credits/credits").then((m) => m.CreditsComponent),
   },
   {
-    path: 'social',
+    path: "social",
     loadComponent: () =>
-      import('./pages/social/social').then(
-        (m) => m.SocialMediaSimComponent
-      ),
+      import("./pages/social/social").then((m) => m.SocialMediaSimComponent),
   },
 ];

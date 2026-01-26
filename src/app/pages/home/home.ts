@@ -1,14 +1,16 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterLink } from "@angular/router";
 
 @Component({
-  selector: 'app-home',
+  selector: "app-home",
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section
+      class="relative min-h-screen flex items-center justify-center overflow-hidden"
+    >
       <!-- Gradient Background -->
       <div
         class="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900"
@@ -20,7 +22,9 @@ import { RouterLink } from '@angular/router';
         class="absolute bottom-0 left-0 w-96 h-96 bg-secondary/10 rounded-full filter blur-3xl opacity-20"
       ></div>
 
-      <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div
+        class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+      >
         <div class="animate-fade-in">
           <!-- Main Heading -->
           <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
@@ -29,7 +33,9 @@ import { RouterLink } from '@angular/router';
           </h1>
 
           <!-- Subheading -->
-          <p class="text-xl sm:text-2xl text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto">
+          <p
+            class="text-xl sm:text-2xl text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto"
+          >
             Run powerful language models locally. Access multiple LLM providers,
             manage your credits, and build amazing applications—all from your
             machine.
@@ -79,9 +85,13 @@ import { RouterLink } from '@angular/router';
         </div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20 pt-20 border-t border-slate-800">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20 pt-20 border-t border-slate-800"
+        >
           <div class="card p-6" *ngFor="let stat of stats">
-            <div class="text-4xl font-bold gradient-text mb-2">{{ stat.value }}</div>
+            <div class="text-4xl font-bold gradient-text mb-2">
+              {{ stat.value }}
+            </div>
             <p class="text-slate-400">{{ stat.label }}</p>
           </div>
         </div>
@@ -113,7 +123,9 @@ import { RouterLink } from '@angular/router';
     </section>
 
     <!-- Footer CTA -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-slate-900 to-slate-800">
+    <section
+      class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-slate-900 to-slate-800"
+    >
       <div class="max-w-4xl mx-auto text-center">
         <h2 class="text-4xl font-bold text-slate-100 mb-6">
           Ready to get started?
@@ -130,47 +142,47 @@ import { RouterLink } from '@angular/router';
 })
 export class HomeComponent {
   stats = [
-    { value: '∞', label: 'Local Processing' },
-    { value: '5+', label: 'LLM Providers' },
-    { value: 'Fast', label: 'Response Time' },
+    { value: "∞", label: "Local Processing" },
+    { value: "5+", label: "LLM Providers" },
+    { value: "Fast", label: "Response Time" },
   ];
 
   features = [
     {
-      icon: '🤖',
-      title: 'Multiple Providers',
+      icon: "🤖",
+      title: "Multiple Providers",
       description:
-        'Connect to Ollama, OpenAI, OpenRouter, Deepseek, Claude, and more.',
+        "Connect to Ollama, OpenAI, OpenRouter, Deepseek, Claude, and more.",
     },
     {
-      icon: '⚡',
-      title: 'Blazing Fast',
+      icon: "⚡",
+      title: "Blazing Fast",
       description:
-        'Local processing means no network latency. Get instant responses.',
+        "Local processing means no network latency. Get instant responses.",
     },
     {
-      icon: '🔒',
-      title: 'Private & Secure',
+      icon: "🔒",
+      title: "Private & Secure",
       description:
-        'Your data stays on your machine. Full control over your environment.',
+        "Your data stays on your machine. Full control over your environment.",
     },
     {
-      icon: '💰',
-      title: 'Credit System',
+      icon: "💰",
+      title: "Credit System",
       description:
-        'Transparent pricing with daily limits and usage tracking for all providers.',
+        "Transparent pricing with daily limits and usage tracking for all providers.",
     },
     {
-      icon: '👥',
-      title: 'Share & Collaborate',
+      icon: "👥",
+      title: "Share & Collaborate",
       description:
-        'Invite friends, share apps, and build together on the platform.',
+        "Invite friends, share apps, and build together on the platform.",
     },
     {
-      icon: '🧩',
-      title: 'Rich App Ecosystem',
+      icon: "🧩",
+      title: "Rich App Ecosystem",
       description:
-        'Discover and create powerful applications powered by local LLMs.',
+        "Discover and create powerful applications powered by local LLMs.",
     },
   ];
 }

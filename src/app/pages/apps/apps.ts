@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 
 interface App {
   id: string;
@@ -9,16 +9,18 @@ interface App {
   icon: string;
   creditsUsed: number;
   lastUsed: string;
-  status: 'active' | 'inactive' | 'new';
+  status: "active" | "inactive" | "new";
   category: string;
 }
 
 @Component({
-  selector: 'app-apps-list',
+  selector: "app-apps-list",
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8"
+    >
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="mb-12">
@@ -35,10 +37,7 @@ interface App {
               [(ngModel)]="searchQuery"
               class="input-field flex-1"
             />
-            <select
-              [(ngModel)]="selectedCategory"
-              class="input-field sm:w-48"
-            >
+            <select [(ngModel)]="selectedCategory" class="input-field sm:w-48">
               <option value="">All Categories</option>
               <option *ngFor="let cat of categories" [value]="cat">
                 {{ cat }}
@@ -57,23 +56,29 @@ interface App {
             <div class="flex justify-between items-start mb-4">
               <div class="text-5xl">{{ app.icon }}</div>
               <span class="badge" [ngClass]="getStatusBadgeClass(app.status)">
-                {{ app.status === 'new' ? '✨ New' : app.status }}
+                {{ app.status === "new" ? "✨ New" : app.status }}
               </span>
             </div>
 
             <!-- App Info -->
-            <h3 class="text-xl font-bold text-slate-100 mb-2">{{ app.name }}</h3>
+            <h3 class="text-xl font-bold text-slate-100 mb-2">
+              {{ app.name }}
+            </h3>
             <p class="text-slate-400 text-sm mb-4 flex-grow">
               {{ app.description }}
             </p>
 
             <!-- App Category -->
             <div class="mb-4">
-              <span class="badge badge-primary text-xs">{{ app.category }}</span>
+              <span class="badge badge-primary text-xs">{{
+                app.category
+              }}</span>
             </div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-2 gap-4 mb-6 py-4 border-t border-b border-slate-800">
+            <div
+              class="grid grid-cols-2 gap-4 mb-6 py-4 border-t border-b border-slate-800"
+            >
               <div>
                 <p class="text-xs text-slate-500 mb-1">Credits Used</p>
                 <p class="text-sm font-semibold text-slate-100">
@@ -90,21 +95,15 @@ interface App {
 
             <!-- Actions -->
             <div class="flex gap-3">
-              <button
-                class="btn-primary flex-1 text-sm"
-              >
-                <svg
-                  class="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
+              <button class="btn-primary flex-1 text-sm">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z"
+                  />
                 </svg>
                 Launch
               </button>
-              <button
-                class="btn-secondary flex-1 text-sm"
-              >
+              <button class="btn-secondary flex-1 text-sm">
                 <svg
                   class="w-4 h-4"
                   fill="none"
@@ -130,10 +129,7 @@ interface App {
         </div>
 
         <!-- Empty State -->
-        <div
-          *ngIf="filteredApps().length === 0"
-          class="text-center py-12"
-        >
+        <div *ngIf="filteredApps().length === 0" class="text-center py-12">
           <div class="text-5xl mb-4">📦</div>
           <h3 class="text-2xl font-bold text-slate-100 mb-2">No apps found</h3>
           <p class="text-slate-400 mb-6">
@@ -145,90 +141,85 @@ interface App {
   `,
 })
 export class AppsListComponent {
-  searchQuery = signal('');
-  selectedCategory = signal('');
+  searchQuery = signal("");
+  selectedCategory = signal("");
 
-  categories = ['Productivity', 'Writing', 'Analysis', 'Development', 'Social'];
+  categories = ["Productivity", "Writing", "Analysis", "Development", "Social"];
 
   apps: App[] = [
     {
-      id: '1',
-      name: 'Social Media Simulator',
-      description:
-        'Simulate social media interactions powered by local LLMs',
-      icon: '📱',
+      id: "1",
+      name: "Social Media Simulator",
+      description: "Simulate social media interactions powered by local LLMs",
+      icon: "📱",
       creditsUsed: 1250,
-      lastUsed: '2 hours ago',
-      status: 'active',
-      category: 'Social',
+      lastUsed: "2 hours ago",
+      status: "active",
+      category: "Social",
     },
     {
-      id: '2',
-      name: 'Code Assistant',
-      description: 'Get AI-powered code suggestions and explanations',
-      icon: '💻',
+      id: "2",
+      name: "Code Assistant",
+      description: "Get AI-powered code suggestions and explanations",
+      icon: "💻",
       creditsUsed: 3420,
-      lastUsed: '1 day ago',
-      status: 'active',
-      category: 'Development',
+      lastUsed: "1 day ago",
+      status: "active",
+      category: "Development",
     },
     {
-      id: '3',
-      name: 'Writing Helper',
+      id: "3",
+      name: "Writing Helper",
       description:
-        'Enhance your writing with AI-powered suggestions and improvements',
-      icon: '✍️',
+        "Enhance your writing with AI-powered suggestions and improvements",
+      icon: "✍️",
       creditsUsed: 892,
-      lastUsed: '3 days ago',
-      status: 'active',
-      category: 'Writing',
+      lastUsed: "3 days ago",
+      status: "active",
+      category: "Writing",
     },
     {
-      id: '4',
-      name: 'Content Analyzer',
+      id: "4",
+      name: "Content Analyzer",
       description:
-        'Analyze and summarize content with advanced NLP capabilities',
-      icon: '📊',
+        "Analyze and summarize content with advanced NLP capabilities",
+      icon: "📊",
       creditsUsed: 0,
-      lastUsed: 'Never',
-      status: 'new',
-      category: 'Analysis',
+      lastUsed: "Never",
+      status: "new",
+      category: "Analysis",
     },
     {
-      id: '5',
-      name: 'Email Composer',
-      description: 'Generate professional emails with AI assistance',
-      icon: '📧',
+      id: "5",
+      name: "Email Composer",
+      description: "Generate professional emails with AI assistance",
+      icon: "📧",
       creditsUsed: 450,
-      lastUsed: '1 week ago',
-      status: 'inactive',
-      category: 'Productivity',
+      lastUsed: "1 week ago",
+      status: "inactive",
+      category: "Productivity",
     },
     {
-      id: '6',
-      name: 'Document Generator',
-      description:
-        'Create structured documents using templates and AI content',
-      icon: '📄',
+      id: "6",
+      name: "Document Generator",
+      description: "Create structured documents using templates and AI content",
+      icon: "📄",
       creditsUsed: 1680,
-      lastUsed: '5 days ago',
-      status: 'active',
-      category: 'Productivity',
+      lastUsed: "5 days ago",
+      status: "active",
+      category: "Productivity",
     },
   ];
 
   filteredApps = (() => {
     return this.apps.filter((app) => {
       const matchesSearch =
-        app.name
-          .toLowerCase()
-          .includes(this.searchQuery().toLowerCase()) ||
+        app.name.toLowerCase().includes(this.searchQuery().toLowerCase()) ||
         app.description
           .toLowerCase()
           .includes(this.searchQuery().toLowerCase());
       const matchesCategory =
-        !this.selectedCategory() ||
-        app.category === this.selectedCategory();
+        !this.selectedCategory() || app.category === this.selectedCategory();
 
       return matchesSearch && matchesCategory;
     });
@@ -236,14 +227,14 @@ export class AppsListComponent {
 
   getStatusBadgeClass(status: string): string {
     switch (status) {
-      case 'active':
-        return 'badge-success';
-      case 'inactive':
-        return 'badge-warning';
-      case 'new':
-        return 'badge-primary';
+      case "active":
+        return "badge-success";
+      case "inactive":
+        return "badge-warning";
+      case "new":
+        return "badge-primary";
       default:
-        return 'badge-primary';
+        return "badge-primary";
     }
   }
 }

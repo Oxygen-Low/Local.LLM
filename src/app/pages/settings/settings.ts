@@ -1,9 +1,9 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Component, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { RouterLink } from "@angular/router";
 
-type SettingsTab = 'llm' | 'account';
+type SettingsTab = "llm" | "account";
 
 interface LLMProvider {
   id: string;
@@ -12,11 +12,13 @@ interface LLMProvider {
 }
 
 @Component({
-  selector: 'app-settings',
+  selector: "app-settings",
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8"
+    >
       <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
@@ -82,9 +84,7 @@ interface LLMProvider {
         <div *ngIf="activeTab() === 'llm'" class="space-y-8">
           <!-- LLM Provider Selection -->
           <div class="card p-8">
-            <h2 class="text-2xl font-bold text-slate-100 mb-6">
-              LLM Provider
-            </h2>
+            <h2 class="text-2xl font-bold text-slate-100 mb-6">LLM Provider</h2>
 
             <div class="mb-8">
               <label class="block text-sm font-medium text-slate-300 mb-3">
@@ -96,7 +96,10 @@ interface LLMProvider {
                 class="input-field w-full"
               >
                 <option value="">-- Choose a provider --</option>
-                <option *ngFor="let provider of llmProviders" [value]="provider.id">
+                <option
+                  *ngFor="let provider of llmProviders"
+                  [value]="provider.id"
+                >
                   {{ provider.name }}
                 </option>
               </select>
@@ -253,7 +256,10 @@ interface LLMProvider {
                   <h3 class="font-bold text-slate-100">Built-in Models</h3>
                   <p class="text-slate-400 text-sm mt-1">
                     Access your available credits in the
-                    <a routerLink="/credits" class="text-primary hover:text-secondary">
+                    <a
+                      routerLink="/credits"
+                      class="text-primary hover:text-secondary"
+                    >
                       Credits page
                     </a>
                     to view built-in model options.
@@ -304,7 +310,10 @@ interface LLMProvider {
                   [(ngModel)]="accountData.isPublic"
                   class="w-4 h-4"
                 />
-                <label for="public-profile" class="text-slate-300 cursor-pointer">
+                <label
+                  for="public-profile"
+                  class="text-slate-300 cursor-pointer"
+                >
                   Make my profile public
                 </label>
               </div>
@@ -468,7 +477,10 @@ interface LLMProvider {
             >
               Cancel
             </button>
-            <button (click)="confirmAccountDeletion()" class="btn-primary flex-1">
+            <button
+              (click)="confirmAccountDeletion()"
+              class="btn-primary flex-1"
+            >
               Delete Account
             </button>
           </div>
@@ -486,96 +498,94 @@ interface LLMProvider {
   ],
 })
 export class SettingsComponent {
-  activeTab = signal<SettingsTab>('llm');
-  selectedProvider = signal('');
+  activeTab = signal<SettingsTab>("llm");
+  selectedProvider = signal("");
   showNotification = signal(false);
-  notificationMessage = signal('');
+  notificationMessage = signal("");
   showDeleteModal = signal(false);
 
   llmProviders: LLMProvider[] = [
     {
-      id: 'ollama',
-      name: 'Ollama',
-      description: 'Run models locally with litellm wrapper',
+      id: "ollama",
+      name: "Ollama",
+      description: "Run models locally with litellm wrapper",
     },
-    { id: 'openai', name: 'OpenAI / ChatGPT', description: 'OpenAI API' },
+    { id: "openai", name: "OpenAI / ChatGPT", description: "OpenAI API" },
     {
-      id: 'openrouter',
-      name: 'OpenRouter',
-      description: 'Access multiple models through OpenRouter',
-    },
-    {
-      id: 'deepseek',
-      name: 'Deepseek',
-      description: 'Deepseek language models',
+      id: "openrouter",
+      name: "OpenRouter",
+      description: "Access multiple models through OpenRouter",
     },
     {
-      id: 'claude',
-      name: 'Claude / Anthropic',
-      description: 'Anthropic Claude models',
+      id: "deepseek",
+      name: "Deepseek",
+      description: "Deepseek language models",
     },
     {
-      id: 'built-in',
-      name: 'Built-In Models',
-      description: 'Use your available credits for built-in models',
+      id: "claude",
+      name: "Claude / Anthropic",
+      description: "Anthropic Claude models",
+    },
+    {
+      id: "built-in",
+      name: "Built-In Models",
+      description: "Use your available credits for built-in models",
     },
   ];
 
   formData = {
-    ollamaUrl: '',
-    apiKey: '',
-    model: '',
+    ollamaUrl: "",
+    apiKey: "",
+    model: "",
   };
 
   accountData = {
-    username: '',
-    bio: '',
+    username: "",
+    bio: "",
     isPublic: false,
   };
 
   passwordData = {
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   };
 
   onProviderChange(): void {
     this.formData = {
-      ollamaUrl: '',
-      apiKey: '',
-      model: '',
+      ollamaUrl: "",
+      apiKey: "",
+      model: "",
     };
   }
 
   getProviderDescription(): string {
     const provider = this.llmProviders.find(
-      (p) => p.id === this.selectedProvider()
+      (p) => p.id === this.selectedProvider(),
     );
-    return provider?.description || '';
+    return provider?.description || "";
   }
 
   saveLLMSettings(): void {
-    this.showMessage('LLM configuration saved successfully!');
+    this.showMessage("LLM configuration saved successfully!");
     // Settings would be saved to backend here
   }
 
   saveAccountSettings(): void {
-    this.showMessage('Profile updated successfully!');
+    this.showMessage("Profile updated successfully!");
     // Settings would be saved to backend here
   }
 
   changePassword(): void {
-    if (
-      this.passwordData.newPassword !== this.passwordData.confirmPassword
-    ) {
-      this.showMessage('Passwords do not match!');
+    if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+      this.showMessage("Passwords do not match!");
       return;
     }
-    this.showMessage('Password updated successfully!');
+    this.showMessage("Password updated successfully!");
     this.passwordData = {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     };
   }
 
@@ -585,7 +595,7 @@ export class SettingsComponent {
 
   confirmAccountDeletion(): void {
     this.showDeleteModal.set(false);
-    this.showMessage('Account deletion request submitted!');
+    this.showMessage("Account deletion request submitted!");
   }
 
   private showMessage(message: string): void {

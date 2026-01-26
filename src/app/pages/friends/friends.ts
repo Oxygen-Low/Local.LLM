@@ -1,12 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 
 interface Friend {
   id: string;
   username: string;
   avatar: string;
-  status: 'online' | 'offline' | 'away';
+  status: "online" | "offline" | "away";
   lastSeen: string;
   addedDate: string;
 }
@@ -16,15 +16,17 @@ interface FriendRequest {
   username: string;
   avatar: string;
   timestamp: string;
-  type: 'incoming' | 'outgoing';
+  type: "incoming" | "outgoing";
 }
 
 @Component({
-  selector: 'app-friends-list',
+  selector: "app-friends-list",
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8"
+    >
       <div class="max-w-5xl mx-auto">
         <!-- Header -->
         <div class="mb-8 flex justify-between items-start">
@@ -58,22 +60,14 @@ interface FriendRequest {
             Friend Requests ({{ friendRequests.length }})
           </h2>
 
-          <div
-            *ngIf="friendRequests.length === 0"
-            class="card p-8 text-center"
-          >
+          <div *ngIf="friendRequests.length === 0" class="card p-8 text-center">
             <div class="text-4xl mb-3">📬</div>
             <p class="text-slate-400">No pending friend requests</p>
           </div>
 
           <!-- Incoming Requests -->
-          <div
-            *ngIf="incomingRequests().length > 0"
-            class="mb-8"
-          >
-            <h3 class="text-slate-300 font-semibold mb-4">
-              Incoming Requests
-            </h3>
+          <div *ngIf="incomingRequests().length > 0" class="mb-8">
+            <h3 class="text-slate-300 font-semibold mb-4">Incoming Requests</h3>
             <div class="space-y-3">
               <div
                 *ngFor="let request of incomingRequests()"
@@ -129,13 +123,8 @@ interface FriendRequest {
           </div>
 
           <!-- Outgoing Requests -->
-          <div
-            *ngIf="outgoingRequests().length > 0"
-            class="mb-8"
-          >
-            <h3 class="text-slate-300 font-semibold mb-4">
-              Sent Requests
-            </h3>
+          <div *ngIf="outgoingRequests().length > 0" class="mb-8">
+            <h3 class="text-slate-300 font-semibold mb-4">Sent Requests</h3>
             <div class="space-y-3">
               <div
                 *ngFor="let request of outgoingRequests()"
@@ -221,11 +210,7 @@ interface FriendRequest {
                 (click)="removeFriend(friend.id)"
                 class="btn-secondary btn-small ml-2"
               >
-                <svg
-                  class="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fill-rule="evenodd"
                     d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -272,12 +257,10 @@ interface FriendRequest {
                   (click)="sendFriendRequest(user)"
                   class="text-primary hover:text-secondary"
                 >
-                  <svg
-                    class="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10.5 1.5H3.75A2.25 2.25 0 001.5 3.75v12.5A2.25 2.25 0 003.75 18.5h12.5a2.25 2.25 0 002.25-2.25V9.5m-15-4h6m-6 4h10m-10 4h10m-10 4h6M17 1.5v6m3-3h-6" />
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M10.5 1.5H3.75A2.25 2.25 0 001.5 3.75v12.5A2.25 2.25 0 003.75 18.5h12.5a2.25 2.25 0 002.25-2.25V9.5m-15-4h6m-6 4h10m-10 4h10m-10 4h6M17 1.5v6m3-3h-6"
+                    />
                   </svg>
                 </button>
               </div>
@@ -306,65 +289,65 @@ interface FriendRequest {
 })
 export class FriendsListComponent {
   showAddFriendModal = signal(false);
-  searchUsername = signal('');
+  searchUsername = signal("");
 
   friends: Friend[] = [
     {
-      id: '1',
-      username: 'alex_dev',
-      avatar: '👨‍💻',
-      status: 'online',
-      lastSeen: 'now',
-      addedDate: '2024-01-15',
+      id: "1",
+      username: "alex_dev",
+      avatar: "👨‍💻",
+      status: "online",
+      lastSeen: "now",
+      addedDate: "2024-01-15",
     },
     {
-      id: '2',
-      username: 'creative_mind',
-      avatar: '🎨',
-      status: 'online',
-      lastSeen: 'now',
-      addedDate: '2024-01-20',
+      id: "2",
+      username: "creative_mind",
+      avatar: "🎨",
+      status: "online",
+      lastSeen: "now",
+      addedDate: "2024-01-20",
     },
     {
-      id: '3',
-      username: 'data_scientist',
-      avatar: '📊',
-      status: 'away',
-      lastSeen: '2 hours ago',
-      addedDate: '2024-01-10',
+      id: "3",
+      username: "data_scientist",
+      avatar: "📊",
+      status: "away",
+      lastSeen: "2 hours ago",
+      addedDate: "2024-01-10",
     },
   ];
 
   friendRequests: FriendRequest[] = [
     {
-      id: '1',
-      username: 'tech_lover',
-      avatar: '🤖',
-      timestamp: '1 hour ago',
-      type: 'incoming',
+      id: "1",
+      username: "tech_lover",
+      avatar: "🤖",
+      timestamp: "1 hour ago",
+      type: "incoming",
     },
     {
-      id: '2',
-      username: 'design_pro',
-      avatar: '✏️',
-      timestamp: '2 days ago',
-      type: 'outgoing',
+      id: "2",
+      username: "design_pro",
+      avatar: "✏️",
+      timestamp: "2 days ago",
+      type: "outgoing",
     },
   ];
 
   incomingRequests() {
-    return this.friendRequests.filter((r) => r.type === 'incoming');
+    return this.friendRequests.filter((r) => r.type === "incoming");
   }
 
   outgoingRequests() {
-    return this.friendRequests.filter((r) => r.type === 'outgoing');
+    return this.friendRequests.filter((r) => r.type === "outgoing");
   }
 
   searchResults() {
     if (!this.searchUsername()) return [];
     const query = this.searchUsername().toLowerCase();
-    return ['john_smith', 'maria_garcia', 'david_chen'].filter((u) =>
-      u.includes(query)
+    return ["john_smith", "maria_garcia", "david_chen"].filter((u) =>
+      u.includes(query),
     );
   }
 
@@ -375,9 +358,9 @@ export class FriendsListComponent {
         id: `f-${id}`,
         username: request.username,
         avatar: request.avatar,
-        status: 'offline',
-        lastSeen: 'just now',
-        addedDate: new Date().toISOString().split('T')[0],
+        status: "offline",
+        lastSeen: "just now",
+        addedDate: new Date().toISOString().split("T")[0],
       });
       this.friendRequests = this.friendRequests.filter((r) => r.id !== id);
     }
@@ -399,30 +382,30 @@ export class FriendsListComponent {
     const request: FriendRequest = {
       id: `req-${Date.now()}`,
       username,
-      avatar: '👤',
-      timestamp: 'just now',
-      type: 'outgoing',
+      avatar: "👤",
+      timestamp: "just now",
+      type: "outgoing",
     };
     this.friendRequests.push(request);
-    this.searchUsername.set('');
+    this.searchUsername.set("");
   }
 
   getStatusColor(status: string): string {
     switch (status) {
-      case 'online':
-        return 'bg-success';
-      case 'away':
-        return 'bg-warning';
-      case 'offline':
-        return 'bg-slate-600';
+      case "online":
+        return "bg-success";
+      case "away":
+        return "bg-warning";
+      case "offline":
+        return "bg-slate-600";
       default:
-        return 'bg-slate-600';
+        return "bg-slate-600";
     }
   }
 
   getStatusText(status: string, lastSeen: string): string {
-    if (status === 'online') return 'Online';
-    if (status === 'away') return 'Away';
+    if (status === "online") return "Online";
+    if (status === "away") return "Away";
     return `Last seen ${lastSeen}`;
   }
 }

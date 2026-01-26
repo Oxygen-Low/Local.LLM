@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
 
 interface CreditUsage {
   app: string;
@@ -16,16 +16,20 @@ interface DailyLimit {
 }
 
 @Component({
-  selector: 'app-credits',
+  selector: "app-credits",
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8"
+    >
       <div class="max-w-6xl mx-auto">
         <!-- Header -->
         <div class="mb-12">
           <h1 class="section-title">Credits</h1>
-          <p class="text-slate-400">Track your credits and usage across models</p>
+          <p class="text-slate-400">
+            Track your credits and usage across models
+          </p>
         </div>
 
         <!-- Main Balance Card -->
@@ -76,9 +80,7 @@ interface DailyLimit {
         <!-- Daily/Weekly Limits -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <div class="card p-8">
-            <h2 class="text-2xl font-bold text-slate-100 mb-6">
-              Daily Limits
-            </h2>
+            <h2 class="text-2xl font-bold text-slate-100 mb-6">Daily Limits</h2>
 
             <div class="space-y-6">
               <div *ngFor="let limit of dailyLimits">
@@ -88,7 +90,9 @@ interface DailyLimit {
                     {{ limit.used }} / {{ limit.limit }}
                   </p>
                 </div>
-                <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                <div
+                  class="w-full bg-slate-800 rounded-full h-3 overflow-hidden"
+                >
                   <div
                     class="bg-gradient-primary h-full transition-all duration-300"
                     [style.width.%]="(limit.used / limit.limit) * 100"
@@ -100,9 +104,7 @@ interface DailyLimit {
 
           <!-- Weekly Usage Chart Placeholder -->
           <div class="card p-8">
-            <h2 class="text-2xl font-bold text-slate-100 mb-6">
-              Weekly Usage
-            </h2>
+            <h2 class="text-2xl font-bold text-slate-100 mb-6">Weekly Usage</h2>
 
             <div class="space-y-4">
               <div *ngFor="let day of weekDays" class="flex items-end gap-3">
@@ -126,10 +128,14 @@ interface DailyLimit {
 
         <!-- Usage Breakdown -->
         <div class="card p-8">
-          <h2 class="text-2xl font-bold text-slate-100 mb-8">Usage Breakdown</h2>
+          <h2 class="text-2xl font-bold text-slate-100 mb-8">
+            Usage Breakdown
+          </h2>
 
           <!-- Stats Summary -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-4 bg-slate-800/50 rounded-lg">
+          <div
+            class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-4 bg-slate-800/50 rounded-lg"
+          >
             <div class="text-center">
               <p class="text-sm text-slate-400 mb-1">Total Apps</p>
               <p class="text-3xl font-bold text-primary">6</p>
@@ -172,7 +178,9 @@ interface DailyLimit {
                     <div class="flex items-center gap-3">
                       <span class="text-2xl">{{ usage.icon }}</span>
                       <div>
-                        <p class="text-slate-100 font-medium">{{ usage.app }}</p>
+                        <p class="text-slate-100 font-medium">
+                          {{ usage.app }}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -245,56 +253,56 @@ interface DailyLimit {
 })
 export class CreditsComponent {
   dailyLimits: DailyLimit[] = [
-    { model: 'GPT-4', used: 750, limit: 1000 },
-    { model: 'Claude 2', used: 450, limit: 800 },
-    { model: 'Ollama', used: 200, limit: 500 },
+    { model: "GPT-4", used: 750, limit: 1000 },
+    { model: "Claude 2", used: 450, limit: 800 },
+    { model: "Ollama", used: 200, limit: 500 },
   ];
 
   weekDays = [
-    { label: 'Mon', usage: 85 },
-    { label: 'Tue', usage: 72 },
-    { label: 'Wed', usage: 95 },
-    { label: 'Thu', usage: 65 },
-    { label: 'Fri', usage: 88 },
-    { label: 'Sat', usage: 42 },
-    { label: 'Sun', usage: 30 },
+    { label: "Mon", usage: 85 },
+    { label: "Tue", usage: 72 },
+    { label: "Wed", usage: 95 },
+    { label: "Thu", usage: 65 },
+    { label: "Fri", usage: 88 },
+    { label: "Sat", usage: 42 },
+    { label: "Sun", usage: 30 },
   ];
 
   usageBreakdown: CreditUsage[] = [
     {
-      app: 'Social Media Simulator',
+      app: "Social Media Simulator",
       credits: 2500,
       percentage: 30,
-      lastUsed: '2 hours ago',
-      icon: '📱',
+      lastUsed: "2 hours ago",
+      icon: "📱",
     },
     {
-      app: 'Code Assistant',
+      app: "Code Assistant",
       credits: 2100,
       percentage: 25,
-      lastUsed: '1 day ago',
-      icon: '💻',
+      lastUsed: "1 day ago",
+      icon: "💻",
     },
     {
-      app: 'Writing Helper',
+      app: "Writing Helper",
       credits: 1800,
       percentage: 22,
-      lastUsed: '3 days ago',
-      icon: '✍️',
+      lastUsed: "3 days ago",
+      icon: "✍️",
     },
     {
-      app: 'Email Composer',
+      app: "Email Composer",
       credits: 1200,
       percentage: 15,
-      lastUsed: '1 week ago',
-      icon: '📧',
+      lastUsed: "1 week ago",
+      icon: "📧",
     },
     {
-      app: 'Document Generator',
+      app: "Document Generator",
       credits: 650,
       percentage: 8,
-      lastUsed: '5 days ago',
-      icon: '📄',
+      lastUsed: "5 days ago",
+      icon: "📄",
     },
   ];
 }

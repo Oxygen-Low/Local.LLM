@@ -1,13 +1,15 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterLink, RouterLinkActive } from "@angular/router";
 
 @Component({
-  selector: 'app-navigation',
+  selector: "app-navigation",
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
-    <nav class="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 glass-effect">
+    <nav
+      class="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 glass-effect"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <!-- Logo -->
