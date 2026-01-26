@@ -79,6 +79,7 @@ export class AuthComponent {
   username = "";
   password = "";
   message = "";
+  isSignup = false;
 
   onSubmit() {
     if (!this.username || !this.password) {
@@ -87,6 +88,16 @@ export class AuthComponent {
     }
 
     // Placeholder authentication logic
-    this.message = `Login attempt: ${this.username}`;
+    if (this.isSignup) {
+      this.message = `Signup attempt: ${this.username}`;
+    } else {
+      this.message = `Login attempt: ${this.username}`;
+    }
+  }
+
+  toggleMode() {
+    this.isSignup = !this.isSignup;
+    this.message = "";
+    this.password = "";
   }
 }
