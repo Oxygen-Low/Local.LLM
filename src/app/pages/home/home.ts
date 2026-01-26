@@ -35,9 +35,7 @@ import { RouterLink } from "@angular/router";
           <p
             class="text-xl sm:text-2xl text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto"
           >
-            Run powerful language models locally. Access multiple LLM providers,
-            manage your credits, and build amazing applications—all from your
-            machine.
+            <p>An open-source community project.</p>
           </p>
 
           <!-- CTA Buttons -->
