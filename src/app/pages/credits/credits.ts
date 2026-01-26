@@ -218,9 +218,9 @@ interface DailyLimit {
 })
 export class CreditsComponent {
   dailyLimits: DailyLimit[] = [
-    { model: "GPT-4", used: 750, limit: 1000 },
-    { model: "Claude 2", used: 450, limit: 800 },
-    { model: "Ollama", used: 200, limit: 500 },
+    { model: "Fast (Gemma3:4b) + Super Fast (Gemma3:1b)", used: 1500, limit: 2000 },
+    { model: "Balanced (Mistral)", used: 450, limit: 800 },
+    { model: "Power (nemotron-3-nano:30b)", used: 100, limit: 200 },
   ];
 
   weekDays = [
