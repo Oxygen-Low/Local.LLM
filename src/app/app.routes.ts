@@ -31,4 +31,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import("./pages/social/social").then((m) => m.SocialMediaSimComponent),
   },
+  {
+    path: "auth",
+    loadComponent: () =>
+      import("./pages/auth/auth").then((m) => m.AuthComponent),
+  },
 ];
