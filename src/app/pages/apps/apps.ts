@@ -26,7 +26,7 @@ interface App {
         <div class="mb-12">
           <h1 class="section-title">Available Apps</h1>
           <p class="text-slate-400 text-lg mb-8">
-            Discover and launch powerful applications powered by local LLMs.
+            Discover and launch apps and games that use LLMs.
           </p>
 
           <!-- Search and Filter -->
