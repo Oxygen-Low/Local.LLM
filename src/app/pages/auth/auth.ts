@@ -73,12 +73,12 @@ import { FormsModule } from "@angular/forms";
           <!-- Toggle Mode -->
           <div class="mt-6 text-center">
             <p class="text-slate-400 text-sm">
-              {{ isSignup ? 'Already have an account?' : 'Don\'t have an account?' }}
+              {{ isSignup ? "Already have an account?" : "Don't have an account?" }}
               <button
                 (click)="toggleMode()"
                 class="text-primary hover:text-primary/80 font-semibold transition"
               >
-                {{ isSignup ? 'Sign In' : 'Sign Up' }}
+                {{ isSignup ? "Sign In" : "Sign Up" }}
               </button>
             </p>
           </div>
