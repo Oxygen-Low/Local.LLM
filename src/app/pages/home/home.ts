@@ -35,7 +35,7 @@ import { RouterLink } from "@angular/router";
           <p
             class="text-xl sm:text-2xl text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto"
           >
-            <p>An open-source community project.</p>
+            An open-source community project.
           </p>
 
           <!-- CTA Buttons -->
