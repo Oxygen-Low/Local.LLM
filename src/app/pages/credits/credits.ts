@@ -37,7 +37,7 @@ interface DailyLimit {
           <p class="text-slate-400 text-lg mb-4">Weekly Credits Available</p>
           <div class="text-7xl font-bold gradient-text mb-6">15,750</div>
           <p class="text-slate-300 text-lg mb-8">
-            Plan reset in <span class="font-semibold">8 days</span>
+            Reset in <span class="font-semibold">8 days</span>
           </p>
 
           <!-- Action Buttons -->
