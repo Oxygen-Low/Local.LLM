@@ -4,32 +4,32 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/home/home.ts').then((m) => m.HomeComponent),
+      import('./pages/home/home').then((m) => m.HomeComponent),
   },
   {
     path: 'apps',
     loadComponent: () =>
-      import('./pages/apps/apps.ts').then((m) => m.AppsListComponent),
+      import('./pages/apps/apps').then((m) => m.AppsListComponent),
   },
   {
     path: 'settings',
     loadComponent: () =>
-      import('./pages/settings/settings.ts').then((m) => m.SettingsComponent),
+      import('./pages/settings/settings').then((m) => m.SettingsComponent),
   },
   {
     path: 'friends',
     loadComponent: () =>
-      import('./pages/friends/friends.ts').then((m) => m.FriendsListComponent),
+      import('./pages/friends/friends').then((m) => m.FriendsListComponent),
   },
   {
     path: 'credits',
     loadComponent: () =>
-      import('./pages/credits/credits.ts').then((m) => m.CreditsComponent),
+      import('./pages/credits/credits').then((m) => m.CreditsComponent),
   },
   {
     path: 'social',
     loadComponent: () =>
-      import('./pages/social/social.ts').then(
+      import('./pages/social/social').then(
         (m) => m.SocialMediaSimComponent
       ),
   },
