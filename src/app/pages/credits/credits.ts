@@ -34,7 +34,7 @@ interface DailyLimit {
 
         <!-- Main Balance Card -->
         <div class="card p-12 mb-12 text-center">
-          <p class="text-slate-400 text-lg mb-4">Total Credits Available</p>
+          <p class="text-slate-400 text-lg mb-4">Weekly Credits Available</p>
           <div class="text-7xl font-bold gradient-text mb-6">15,750</div>
           <p class="text-slate-300 text-lg mb-8">
             Plan reset in <span class="font-semibold">8 days</span>
