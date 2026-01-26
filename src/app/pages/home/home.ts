@@ -95,11 +95,6 @@ import { RouterLink } from "@angular/router";
             *ngFor="let feature of features"
             class="card p-8 card-hover group"
           >
-            <div
-              class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-250"
-            >
-              {{ feature.icon }}
-            </div>
             <h3 class="text-xl font-bold text-slate-100 mb-3">
               {{ feature.title }}
             </h3>
