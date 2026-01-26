@@ -66,9 +66,22 @@ import { FormsModule } from "@angular/forms";
               type="submit"
               class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
             >
-              Sign In
+              {{ isSignup ? 'Create Account' : 'Sign In' }}
             </button>
           </form>
+
+          <!-- Toggle Mode -->
+          <div class="mt-6 text-center">
+            <p class="text-slate-400 text-sm">
+              {{ isSignup ? 'Already have an account?' : 'Don\'t have an account?' }}
+              <button
+                (click)="toggleMode()"
+                class="text-primary hover:text-primary/80 font-semibold transition"
+              >
+                {{ isSignup ? 'Sign In' : 'Sign Up' }}
+              </button>
+            </p>
+          </div>
 
           <!-- Message -->
           <div *ngIf="message" class="mt-6 p-4 bg-slate-700/50 rounded-lg border border-slate-600">
