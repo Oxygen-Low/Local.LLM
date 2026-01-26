@@ -19,8 +19,12 @@ import { FormsModule } from "@angular/forms";
         <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-2xl p-8 shadow-2xl">
           <!-- Header -->
           <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-slate-100 mb-2">Welcome Back</h1>
-            <p class="text-slate-400">Sign in to your account</p>
+            <h1 class="text-4xl font-bold text-slate-100 mb-2">
+              {{ isSignup ? 'Create Account' : 'Welcome Back' }}
+            </h1>
+            <p class="text-slate-400">
+              {{ isSignup ? 'Create a new account' : 'Sign in to your account' }}
+            </p>
           </div>
 
           <!-- Form -->
