@@ -123,12 +123,6 @@ import { RouterLink } from "@angular/router";
   `,
 })
 export class HomeComponent {
-  stats = [
-    { value: "∞", label: "Local Processing" },
-    { value: "5+", label: "LLM Providers" },
-    { value: "Fast", label: "Response Time" },
-  ];
-
   features = [
     {
       icon: "🤖",
@@ -138,33 +132,33 @@ export class HomeComponent {
     },
     {
       icon: "⚡",
-      title: "Blazing Fast",
+      title: "Large Model Selection",
       description:
-        "Local processing means no network latency. Get instant responses.",
+        "Pick any model from any provider.",
     },
     {
       icon: "🔒",
       title: "Private & Secure",
       description:
-        "Your data stays on your machine. Full control over your environment.",
+        "We almost never view your information, unless we detect you trying to bypass safety.",
     },
     {
       icon: "💰",
       title: "Credit System",
       description:
-        "Transparent pricing with daily limits and usage tracking for all providers.",
+        "Free LLM credits with a daily and weekly limit for those who are unable to run LLM models on their device.",
     },
     {
       icon: "👥",
       title: "Share & Collaborate",
       description:
-        "Invite friends, share apps, and build together on the platform.",
+        "Some apps support multiplayer. Add your friends and create an adventure (or develop some things).",
     },
     {
       icon: "🧩",
       title: "Rich App Ecosystem",
       description:
-        "Discover and create powerful applications powered by local LLMs.",
+        "Discover apps, many for different purposes.",
     },
   ];
 }
