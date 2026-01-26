@@ -107,11 +107,11 @@ interface LLMProvider {
 
             <!-- Dynamic Form Fields Based on Provider -->
             <div
-              *ngIf="selectedProvider && selectedProvider !== 'built-in'"
+              *ngIf="selectedProvider() && selectedProvider() !== 'built-in'"
               class="space-y-6 pt-6 border-t border-slate-800"
             >
               <!-- Ollama Fields -->
-              <ng-container *ngIf="selectedProvider === 'ollama'">
+              <ng-container *ngIf="selectedProvider() === 'ollama'">
                 <div>
                   <label class="block text-sm font-medium text-slate-300 mb-2">
                     Ollama Base URL
@@ -129,7 +129,7 @@ interface LLMProvider {
               </ng-container>
 
               <!-- OpenAI Fields -->
-              <ng-container *ngIf="selectedProvider === 'openai'">
+              <ng-container *ngIf="selectedProvider() === 'openai'">
                 <div>
                   <label class="block text-sm font-medium text-slate-300 mb-2">
                     API Key
@@ -147,7 +147,7 @@ interface LLMProvider {
               </ng-container>
 
               <!-- OpenRouter Fields -->
-              <ng-container *ngIf="selectedProvider === 'openrouter'">
+              <ng-container *ngIf="selectedProvider() === 'openrouter'">
                 <div>
                   <label class="block text-sm font-medium text-slate-300 mb-2">
                     API Key
@@ -176,7 +176,7 @@ interface LLMProvider {
               </ng-container>
 
               <!-- Deepseek Fields -->
-              <ng-container *ngIf="selectedProvider === 'deepseek'">
+              <ng-container *ngIf="selectedProvider() === 'deepseek'">
                 <div>
                   <label class="block text-sm font-medium text-slate-300 mb-2">
                     API Key
@@ -194,7 +194,7 @@ interface LLMProvider {
               </ng-container>
 
               <!-- Claude/Anthropic Fields -->
-              <ng-container *ngIf="selectedProvider === 'claude'">
+              <ng-container *ngIf="selectedProvider() === 'claude'">
                 <div>
                   <label class="block text-sm font-medium text-slate-300 mb-2">
                     API Key
@@ -234,7 +234,7 @@ interface LLMProvider {
 
             <!-- Built-in Information -->
             <div
-              *ngIf="selectedProvider === 'built-in'"
+              *ngIf="selectedProvider() === 'built-in'"
               class="p-6 bg-primary/5 border border-primary/20 rounded-lg mt-6"
             >
               <div class="flex items-start gap-3">
