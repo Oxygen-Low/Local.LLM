@@ -206,9 +206,8 @@ interface DailyLimit {
                 What happens if I run out of credits?
               </h3>
               <p class="text-slate-400">
-                You can still use built-in models with limited capacity or
-                purchase additional credits. You'll be notified when your
-                credits are running low.
+                You can still use external llm providers such as
+                OpenAI.
               </p>
             </div>
           </div>
