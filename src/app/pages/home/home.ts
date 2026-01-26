@@ -113,10 +113,8 @@ import { RouterLink } from "@angular/router";
           Ready to get started?
         </h2>
         <p class="text-xl text-slate-400 mb-8">
-          <p>
-            Clone or fork our github repository - Or just use this
-            website.
-          </p>
+          Clone or fork our github repository - Or just use this
+          website.
         </p>
       </div>
     </section>
