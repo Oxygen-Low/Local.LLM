@@ -82,16 +82,6 @@ import { RouterLink } from "@angular/router";
         </div>
 
         <!-- Stats -->
-        <div
-          class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20 pt-20 border-t border-slate-800"
-        >
-          <div class="card p-6" *ngFor="let stat of stats">
-            <div class="text-4xl font-bold gradient-text mb-2">
-              {{ stat.value }}
-            </div>
-            <p class="text-slate-400">{{ stat.label }}</p>
-          </div>
-        </div>
       </div>
     </section>
 
