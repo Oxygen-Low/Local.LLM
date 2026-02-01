@@ -17,7 +17,7 @@ export class App implements OnInit {
 
   ngOnInit() {
     this.router.events.subscribe(() => {
-      this.showNavigation = !this.router.url.startsWith("/auth");
+      this.showNavigation = !this.router.url.startsWith("/auth") && this.router.url !== "/";
     });
   }
 }
