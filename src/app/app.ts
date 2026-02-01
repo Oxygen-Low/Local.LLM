@@ -12,7 +12,7 @@ import { filter } from "rxjs/operators";
   styleUrl: "./app.css",
 })
 export class App implements OnInit {
-  showNavigation = true;
+  showNavigation = false;
 
   constructor(private router: Router) {}
 
