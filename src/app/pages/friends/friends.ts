@@ -32,7 +32,7 @@ interface FriendRequest {
         <div class="mb-8 flex justify-between items-start">
           <div>
             <h1 class="section-title">Friends</h1>
-            <p class="text-slate-400">
+            <p class="text-gray-400">
               Manage your friends and friend requests
             </p>
           </div>
