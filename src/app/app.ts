@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
+import { RouterOutlet, Router, NavigationStart } from "@angular/router";
 import { NavigationComponent } from "./components/navigation";
 import { CommonModule } from "@angular/common";
 import { filter } from "rxjs/operators";
@@ -12,20 +12,24 @@ import { filter } from "rxjs/operators";
   styleUrl: "./app.css",
 })
 export class App implements OnInit {
-  showNavigation = false;
+  showNavigation = true;
 
   constructor(private router: Router) {}
 
   ngOnInit() {
-    // Hide navigation on home and auth routes
-    const updateNavigation = () => {
-      const url = this.router.url || "/";
-      this.showNavigation = url !== "/" && !url.startsWith("/auth");
-    };
+    // Initialize navigation visibility based on current URL
+    this.updateNavigation(this.router.url);
 
-    updateNavigation();
+    // Update navigation visibility on route changes
     this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(updateNavigation);
+      .pipe(filter((event) => event instanceof NavigationStart))
+      .subscribe((event: any) => {
+        this.updateNavigation(event.url);
+      });
+  }
+
+  private updateNavigation(url: string) {
+    // Hide navigation on home ("/") and auth routes ("/auth*")
+    this.showNavigation = url !== "/" && !url.startsWith("/auth");
   }
 }
