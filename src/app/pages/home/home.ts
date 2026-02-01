@@ -87,7 +87,7 @@ import { RouterLink } from "@angular/router";
     </section>
   `,
 })
-export class HomeComponent {
+export class AboutComponent {
   features = [
     {
       icon: "🤖",
