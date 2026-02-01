@@ -32,6 +32,11 @@
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
+  "overrides": {
+    "sucrase": {
+      "glob": "^10.5.0"
+    }
+  },
   "devDependencies": {
     "@angular/build": "^20.3.15",
     "@angular/cli": "^20.3.15",
