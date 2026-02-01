@@ -61,10 +61,10 @@ interface App {
             </div>
 
             <!-- App Info -->
-            <h3 class="text-xl font-bold text-slate-100 mb-2">
+            <h3 class="text-xl font-bold text-gray-100 mb-2">
               {{ app.name }}
             </h3>
-            <p class="text-slate-400 text-sm mb-4 flex-grow">
+            <p class="text-gray-400 text-sm mb-4 flex-grow">
               {{ app.description }}
             </p>
 
@@ -77,17 +77,17 @@ interface App {
 
             <!-- Stats -->
             <div
-              class="grid grid-cols-2 gap-4 mb-6 py-4 border-t border-b border-slate-800"
+              class="grid grid-cols-2 gap-4 mb-6 py-4 border-t border-b border-gray-800"
             >
               <div>
-                <p class="text-xs text-slate-500 mb-1">Credits Used</p>
-                <p class="text-sm font-semibold text-slate-100">
+                <p class="text-xs text-gray-500 mb-1">Credits Used</p>
+                <p class="text-sm font-semibold text-gray-100">
                   {{ app.creditsUsed }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-slate-500 mb-1">Last Used</p>
-                <p class="text-sm font-semibold text-slate-100">
+                <p class="text-xs text-gray-500 mb-1">Last Used</p>
+                <p class="text-sm font-semibold text-gray-100">
                   {{ app.lastUsed }}
                 </p>
               </div>
@@ -131,8 +131,8 @@ interface App {
         <!-- Empty State -->
         <div *ngIf="filteredApps().length === 0" class="text-center py-12">
           <div class="text-5xl mb-4">📦</div>
-          <h3 class="text-2xl font-bold text-slate-100 mb-2">No apps found</h3>
-          <p class="text-slate-400 mb-6">
+          <h3 class="text-2xl font-bold text-gray-100 mb-2">No apps found</h3>
+          <p class="text-gray-400 mb-6">
             Try adjusting your search or filters
           </p>
         </div>
