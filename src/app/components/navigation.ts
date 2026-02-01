@@ -133,6 +133,20 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
     </div>
   `,
 })
-export class NavigationComponent {
+export class NavigationComponent implements OnInit {
   sidebarOpen = signal(false);
+  isMobile = signal(false);
+
+  ngOnInit() {
+    this.updateIsMobile();
+  }
+
+  @HostListener("window:resize", ["$event"])
+  onResize(event: any) {
+    this.updateIsMobile();
+  }
+
+  private updateIsMobile() {
+    this.isMobile.set(window.innerWidth < 768);
+  }
 }
