@@ -67,7 +67,7 @@ interface FriendRequest {
 
           <!-- Incoming Requests -->
           <div *ngIf="incomingRequests().length > 0" class="mb-8">
-            <h3 class="text-slate-300 font-semibold mb-4">Incoming Requests</h3>
+            <h3 class="text-gray-300 font-semibold mb-4">Incoming Requests</h3>
             <div class="space-y-3">
               <div
                 *ngFor="let request of incomingRequests()"
@@ -124,7 +124,7 @@ interface FriendRequest {
 
           <!-- Outgoing Requests -->
           <div *ngIf="outgoingRequests().length > 0" class="mb-8">
-            <h3 class="text-slate-300 font-semibold mb-4">Sent Requests</h3>
+            <h3 class="text-gray-300 font-semibold mb-4">Sent Requests</h3>
             <div class="space-y-3">
               <div
                 *ngFor="let request of outgoingRequests()"
@@ -233,7 +233,7 @@ interface FriendRequest {
 
           <div class="space-y-4 mb-6">
             <div>
-              <label class="block text-sm font-medium text-slate-300 mb-2">
+              <label class="block text-sm font-medium text-gray-300 mb-2">
                 Search Username
               </label>
               <input
