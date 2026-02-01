@@ -23,11 +23,11 @@ interface LLMProvider {
         <!-- Header -->
         <div class="mb-8">
           <h1 class="section-title">Settings</h1>
-          <p class="text-slate-400">Configure your local.llm experience</p>
+          <p class="text-gray-400">Configure your local.llm experience</p>
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex gap-4 mb-8 border-b border-slate-800">
+        <div class="flex gap-4 mb-8 border-b border-gray-800">
           <button
             (click)="activeTab.set('llm')"
             [class.active]="activeTab() === 'llm'"
@@ -35,7 +35,7 @@ interface LLMProvider {
             [ngClass]="
               activeTab() === 'llm'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-slate-400 hover:text-slate-300'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
             "
           >
             <svg
@@ -60,7 +60,7 @@ interface LLMProvider {
             [ngClass]="
               activeTab() === 'account'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-slate-400 hover:text-slate-300'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
             "
           >
             <svg
@@ -84,10 +84,10 @@ interface LLMProvider {
         <div *ngIf="activeTab() === 'llm'" class="space-y-8">
           <!-- LLM Provider Selection -->
           <div class="card p-8">
-            <h2 class="text-2xl font-bold text-slate-100 mb-6">LLM Provider</h2>
+            <h2 class="text-2xl font-bold text-gray-100 mb-6">LLM Provider</h2>
 
             <div class="mb-8">
-              <label class="block text-sm font-medium text-slate-300 mb-3">
+              <label class="block text-sm font-medium text-gray-300 mb-3">
                 Select Provider
               </label>
               <select
@@ -103,7 +103,7 @@ interface LLMProvider {
                   {{ provider.name }}
                 </option>
               </select>
-              <p *ngIf="selectedProvider" class="text-slate-400 text-sm mt-2">
+              <p *ngIf="selectedProvider" class="text-gray-400 text-sm mt-2">
                 {{ getProviderDescription() }}
               </p>
             </div>
@@ -111,12 +111,12 @@ interface LLMProvider {
             <!-- Dynamic Form Fields Based on Provider -->
             <div
               *ngIf="selectedProvider() && selectedProvider() !== 'built-in'"
-              class="space-y-6 pt-6 border-t border-slate-800"
+              class="space-y-6 pt-6 border-t border-gray-800"
             >
               <!-- Ollama Fields -->
               <ng-container *ngIf="selectedProvider() === 'ollama'">
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
                     Ollama Base URL
                   </label>
                   <input
@@ -125,7 +125,7 @@ interface LLMProvider {
                     [(ngModel)]="formData.ollamaUrl"
                     class="input-field"
                   />
-                  <p class="text-slate-500 text-sm mt-1">
+                  <p class="text-gray-500 text-sm mt-1">
                     The URL where Ollama is running
                   </p>
                 </div>
@@ -134,7 +134,7 @@ interface LLMProvider {
               <!-- OpenAI Fields -->
               <ng-container *ngIf="selectedProvider() === 'openai'">
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
                     API Key
                   </label>
                   <input
@@ -143,7 +143,7 @@ interface LLMProvider {
                     [(ngModel)]="formData.apiKey"
                     class="input-field"
                   />
-                  <p class="text-slate-500 text-sm mt-1">
+                  <p class="text-gray-500 text-sm mt-1">
                     Your OpenAI API key (stored locally)
                   </p>
                 </div>
@@ -152,7 +152,7 @@ interface LLMProvider {
               <!-- OpenRouter Fields -->
               <ng-container *ngIf="selectedProvider() === 'openrouter'">
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
                     API Key
                   </label>
                   <input
@@ -161,12 +161,12 @@ interface LLMProvider {
                     [(ngModel)]="formData.apiKey"
                     class="input-field"
                   />
-                  <p class="text-slate-500 text-sm mt-1">
+                  <p class="text-gray-500 text-sm mt-1">
                     Your OpenRouter API key
                   </p>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
                     Model Selection
                   </label>
                   <select [(ngModel)]="formData.model" class="input-field">
@@ -181,7 +181,7 @@ interface LLMProvider {
               <!-- Deepseek Fields -->
               <ng-container *ngIf="selectedProvider() === 'deepseek'">
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
                     API Key
                   </label>
                   <input
@@ -190,7 +190,7 @@ interface LLMProvider {
                     [(ngModel)]="formData.apiKey"
                     class="input-field"
                   />
-                  <p class="text-slate-500 text-sm mt-1">
+                  <p class="text-gray-500 text-sm mt-1">
                     Your Deepseek API key
                   </p>
                 </div>
@@ -199,7 +199,7 @@ interface LLMProvider {
               <!-- Claude/Anthropic Fields -->
               <ng-container *ngIf="selectedProvider() === 'claude'">
                 <div>
-                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
                     API Key
                   </label>
                   <input
@@ -208,14 +208,14 @@ interface LLMProvider {
                     [(ngModel)]="formData.apiKey"
                     class="input-field"
                   />
-                  <p class="text-slate-500 text-sm mt-1">
+                  <p class="text-gray-500 text-sm mt-1">
                     Your Anthropic Claude API key
                   </p>
                 </div>
               </ng-container>
 
               <!-- Save Button -->
-              <div class="pt-6 border-t border-slate-800">
+              <div class="pt-6 border-t border-gray-800">
                 <button (click)="saveLLMSettings()" class="btn-primary">
                   <svg
                     class="w-5 h-5"
@@ -253,8 +253,8 @@ interface LLMProvider {
                   />
                 </svg>
                 <div>
-                  <h3 class="font-bold text-slate-100">Built-in Models</h3>
-                  <p class="text-slate-400 text-sm mt-1">
+                  <h3 class="font-bold text-gray-100">Built-in Models</h3>
+                  <p class="text-gray-400 text-sm mt-1">
                     Access your available credits in the
                     <a
                       routerLink="/credits"
@@ -274,13 +274,13 @@ interface LLMProvider {
         <div *ngIf="activeTab() === 'account'" class="space-y-8">
           <!-- Profile Information -->
           <div class="card p-8">
-            <h2 class="text-2xl font-bold text-slate-100 mb-6">
+            <h2 class="text-2xl font-bold text-gray-100 mb-6">
               Profile Information
             </h2>
 
             <div class="space-y-6">
               <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">
+                <label class="block text-sm font-medium text-gray-300 mb-2">
                   Username
                 </label>
                 <input
@@ -292,7 +292,7 @@ interface LLMProvider {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">
+                <label class="block text-sm font-medium text-gray-300 mb-2">
                   Bio
                 </label>
                 <textarea
@@ -312,7 +312,7 @@ interface LLMProvider {
                 />
                 <label
                   for="public-profile"
-                  class="text-slate-300 cursor-pointer"
+                  class="text-gray-300 cursor-pointer"
                 >
                   Make my profile public
                 </label>
@@ -339,11 +339,11 @@ interface LLMProvider {
 
           <!-- Security -->
           <div class="card p-8">
-            <h2 class="text-2xl font-bold text-slate-100 mb-6">Security</h2>
+            <h2 class="text-2xl font-bold text-gray-100 mb-6">Security</h2>
 
             <div class="space-y-6">
               <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">
+                <label class="block text-sm font-medium text-gray-300 mb-2">
                   Current Password
                 </label>
                 <input
@@ -355,7 +355,7 @@ interface LLMProvider {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">
+                <label class="block text-sm font-medium text-gray-300 mb-2">
                   New Password
                 </label>
                 <input
@@ -367,7 +367,7 @@ interface LLMProvider {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">
+                <label class="block text-sm font-medium text-gray-300 mb-2">
                   Confirm New Password
                 </label>
                 <input
@@ -399,11 +399,11 @@ interface LLMProvider {
 
           <!-- Data Management -->
           <div class="card p-8 border-error/20">
-            <h2 class="text-2xl font-bold text-slate-100 mb-6">
+            <h2 class="text-2xl font-bold text-gray-100 mb-6">
               Data Management
             </h2>
 
-            <p class="text-slate-400 mb-6">
+            <p class="text-gray-400 mb-6">
               Manage your data and account deletion preferences.
             </p>
 
@@ -463,10 +463,10 @@ interface LLMProvider {
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       >
         <div class="card p-8 max-w-md mx-4">
-          <h3 class="text-xl font-bold text-slate-100 mb-4">
+          <h3 class="text-xl font-bold text-gray-100 mb-4">
             Confirm Account Deletion
           </h3>
-          <p class="text-slate-400 mb-6">
+          <p class="text-gray-400 mb-6">
             This action cannot be undone. All your data will be permanently
             deleted.
           </p>
