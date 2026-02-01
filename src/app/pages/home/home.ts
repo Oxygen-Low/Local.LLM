@@ -33,7 +33,7 @@ import { RouterLink } from "@angular/router";
 
           <!-- Subheading -->
           <p
-            class="text-xl sm:text-2xl text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto"
+            class="text-xl sm:text-2xl text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto"
           >
             An open-source community project.
           </p>
@@ -50,7 +50,7 @@ import { RouterLink } from "@angular/router";
     </section>
 
     <!-- Features Section -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50">
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/50">
       <div class="max-w-6xl mx-auto">
         <h2 class="section-title text-center">Why local.llm?</h2>
 
@@ -59,10 +59,10 @@ import { RouterLink } from "@angular/router";
             *ngFor="let feature of features"
             class="card p-8 card-hover group"
           >
-            <h3 class="text-xl font-bold text-slate-100 mb-3">
+            <h3 class="text-xl font-bold text-gray-100 mb-3">
               {{ feature.title }}
             </h3>
-            <p class="text-slate-400">{{ feature.description }}</p>
+            <p class="text-gray-400">{{ feature.description }}</p>
           </div>
         </div>
       </div>
@@ -70,10 +70,10 @@ import { RouterLink } from "@angular/router";
 
     <!-- Footer CTA -->
     <section
-      class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-slate-900 to-slate-800"
+      class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-gray-900 to-gray-800"
     >
       <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-4xl font-bold text-slate-100 mb-6">
+        <h2 class="text-4xl font-bold text-gray-100 mb-6">
           Ready to get started?
         </h2>
         <p>Hosted: Use this website.</p>
