@@ -109,15 +109,6 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
       <div *ngIf="mobileMenuOpen()" class="md:hidden border-t border-slate-800">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <a
-            routerLink="/"
-            routerLinkActive="bg-slate-800 text-primary"
-            [routerLinkActiveOptions]="{ exact: true }"
-            (click)="mobileMenuOpen.set(false)"
-            class="text-slate-300 hover:bg-slate-800 hover:text-slate-100 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-250"
-          >
-            Home
-          </a>
-          <a
             routerLink="/apps"
             routerLinkActive="bg-slate-800 text-primary"
             (click)="mobileMenuOpen.set(false)"
