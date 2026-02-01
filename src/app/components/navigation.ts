@@ -26,14 +26,6 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
               <a
-                routerLink="/"
-                routerLinkActive="text-primary border-b-2 border-primary"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="text-slate-300 hover:text-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-250"
-              >
-                Home
-              </a>
-              <a
                 routerLink="/apps"
                 routerLinkActive="text-primary border-b-2 border-primary"
                 class="text-slate-300 hover:text-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-250"
