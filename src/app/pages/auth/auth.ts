@@ -16,13 +16,13 @@ import { FormsModule } from "@angular/forms";
 
       <!-- Auth Card -->
       <div class="relative z-10 w-full max-w-md">
-        <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-2xl p-8 shadow-2xl">
+        <div class="bg-gray-800/50 backdrop-blur-md border border-gray-700 rounded-2xl p-8 shadow-2xl">
           <!-- Header -->
           <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-slate-100 mb-2">
+            <h1 class="text-4xl font-bold text-gray-100 mb-2">
               {{ isSignup ? 'Create Account' : 'Welcome Back' }}
             </h1>
-            <p class="text-slate-400">
+            <p class="text-gray-400">
               {{ isSignup ? 'Create a new account' : 'Sign in to your account' }}
             </p>
           </div>
@@ -31,7 +31,7 @@ import { FormsModule } from "@angular/forms";
           <form (ngSubmit)="onSubmit()" class="space-y-6">
             <!-- Username Field -->
             <div>
-              <label for="username" class="block text-sm font-medium text-slate-300 mb-2">
+              <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
                 Username
               </label>
               <input
@@ -39,7 +39,7 @@ import { FormsModule } from "@angular/forms";
                 type="text"
                 [(ngModel)]="username"
                 name="username"
-                class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                class="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
                 placeholder="Enter your username"
                 required
               />
@@ -47,7 +47,7 @@ import { FormsModule } from "@angular/forms";
 
             <!-- Password Field -->
             <div>
-              <label for="password" class="block text-sm font-medium text-slate-300 mb-2">
+              <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
                 Password
               </label>
               <input
@@ -55,7 +55,7 @@ import { FormsModule } from "@angular/forms";
                 type="password"
                 [(ngModel)]="password"
                 name="password"
-                class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                class="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
                 placeholder="Enter your password"
                 required
               />
@@ -72,7 +72,7 @@ import { FormsModule } from "@angular/forms";
 
           <!-- Toggle Mode -->
           <div class="mt-6 text-center">
-            <p class="text-slate-400 text-sm">
+            <p class="text-gray-400 text-sm">
               {{ isSignup ? "Already have an account?" : "Don't have an account?" }}
               <button
                 (click)="toggleMode()"
@@ -84,8 +84,8 @@ import { FormsModule } from "@angular/forms";
           </div>
 
           <!-- Message -->
-          <div *ngIf="message" class="mt-6 p-4 bg-slate-700/50 rounded-lg border border-slate-600">
-            <p class="text-slate-300 text-sm text-center">{{ message }}</p>
+          <div *ngIf="message" class="mt-6 p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+            <p class="text-gray-300 text-sm text-center">{{ message }}</p>
           </div>
         </div>
       </div>
