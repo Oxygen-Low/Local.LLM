@@ -40,12 +40,8 @@ import { RouterLink } from "@angular/router";
 
           <!-- Auth Buttons -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <a routerLink="/auth" class="btn-primary">
-              Sign In
-            </a>
-            <a routerLink="/auth" class="btn-secondary">
-              Sign Up
-            </a>
+            <a routerLink="/auth" class="btn-primary"> Sign In </a>
+            <a routerLink="/auth" class="btn-secondary"> Sign Up </a>
           </div>
         </div>
 
