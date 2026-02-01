@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { RouterOutlet, Router, NavigationEnd, NavigationStart } from "@angular/router";
+import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { NavigationComponent } from "./components/navigation";
 import { CommonModule } from "@angular/common";
 import { filter } from "rxjs/operators";
@@ -17,28 +17,27 @@ export class App implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    // Initialize navigation visibility
-    setTimeout(() => {
-      this.updateNavigation(this.router.url || "/");
-    }, 0);
-
-    // Update on navigation start
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationStart))
-      .subscribe((event: any) => {
-        this.updateNavigation(event.url);
-      });
-
-    // Also update on navigation end as fallback
+    // Subscribe to route changes
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        this.updateNavigation(event.urlAfterRedirects);
-      });
-  }
+      .subscribe(() => {
+        // Get current route
+        const currentRoute = this.router.url;
+        console.log("Route changed to:", currentRoute); // Debug
 
-  private updateNavigation(url: string) {
-    // Hide navigation on home ("/") and auth routes ("/auth*")
-    this.showNavigation = url !== "/" && !url.startsWith("/auth");
+        // Hide navigation on home and auth pages
+        if (currentRoute === "/" || currentRoute.startsWith("/auth")) {
+          this.showNavigation = false;
+        } else {
+          this.showNavigation = true;
+        }
+      });
+
+    // Set initial state
+    const initialRoute = this.router.url;
+    console.log("Initial route:", initialRoute); // Debug
+    if (initialRoute === "/" || initialRoute.startsWith("/auth")) {
+      this.showNavigation = false;
+    }
   }
 }
