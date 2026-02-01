@@ -1,4 +1,6 @@
-<app-navigation *ngIf="showNavigation()"></app-navigation>
-<main class="min-h-screen">
-  <router-outlet></router-outlet>
-</main>
+<div class="flex h-screen bg-black">
+  <app-navigation *ngIf="showNavigation()"></app-navigation>
+  <main class="flex-1 overflow-auto">
+    <router-outlet></router-outlet>
+  </main>
+</div>
