@@ -8,7 +8,9 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
     <nav
-      class="w-64 bg-black border-r border-gray-800 flex flex-col h-full fixed left-0 top-0 md:relative md:w-64"
+      class="w-64 bg-black border-r border-gray-800 flex flex-col h-full fixed left-0 top-0 bottom-0 z-50 md:relative md:z-auto md:sticky md:top-0"
+      [class.translate-x-0]="sidebarOpen() || !isMobile()"
+      [class.-translate-x-full]="!sidebarOpen() && isMobile()"
     >
       <!-- Logo Section -->
       <div class="px-6 py-8 border-b border-gray-800">
