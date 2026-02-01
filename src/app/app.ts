@@ -1,7 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { RouterOutlet, Router } from "@angular/router";
+import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { NavigationComponent } from "./components/navigation";
 import { CommonModule } from "@angular/common";
+import { filter } from "rxjs/operators";
 
 @Component({
   selector: "app-root",
@@ -16,8 +17,16 @@ export class App implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.router.events.subscribe(() => {
-      this.showNavigation = !this.router.url.startsWith("/auth") && this.router.url !== "/";
-    });
+    this.updateNavigation();
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.updateNavigation();
+      });
+  }
+
+  private updateNavigation() {
+    const url = this.router.url;
+    this.showNavigation = url !== "/" && !url.startsWith("/auth");
   }
 }
