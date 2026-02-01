@@ -8,143 +8,129 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
     <nav
-      class="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 glass-effect"
+      class="w-64 bg-black border-r border-gray-800 flex flex-col h-full fixed left-0 top-0 md:relative md:w-64"
     >
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <!-- Logo -->
-          <div class="flex-shrink-0">
-            <a
-              routerLink="/"
-              class="text-2xl font-bold gradient-text hover:opacity-80 transition-opacity"
-            >
-              local.llm
-            </a>
-          </div>
-
-          <!-- Desktop Navigation -->
-          <div class="hidden md:block">
-            <div class="ml-10 flex items-baseline space-x-4">
-              <a
-                routerLink="/apps"
-                routerLinkActive="text-primary border-b-2 border-primary"
-                class="text-slate-300 hover:text-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-250"
-              >
-                Apps
-              </a>
-              <a
-                routerLink="/friends"
-                routerLinkActive="text-primary border-b-2 border-primary"
-                class="text-slate-300 hover:text-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-250"
-              >
-                Friends
-              </a>
-              <a
-                routerLink="/credits"
-                routerLinkActive="text-primary border-b-2 border-primary"
-                class="text-slate-300 hover:text-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-250"
-              >
-                Credits
-              </a>
-              <a
-                routerLink="/settings"
-                routerLinkActive="text-primary border-b-2 border-primary"
-                class="text-slate-300 hover:text-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-250"
-              >
-                Settings
-              </a>
-            </div>
-          </div>
-
-          <!-- User Menu Icon -->
-          <div class="hidden md:block">
-            <div class="ml-4 flex items-center md:ml-6">
-              <button
-                class="p-1 rounded-full text-slate-400 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-primary transition-colors duration-250"
-              >
-                <svg
-                  class="h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Mobile Menu Button -->
-          <div class="md:hidden">
-            <button
-              (click)="mobileMenuOpen.set(!mobileMenuOpen())"
-              class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary transition-colors duration-250"
-            >
-              <svg
-                class="h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+      <!-- Logo Section -->
+      <div class="px-6 py-8 border-b border-gray-800">
+        <a
+          routerLink="/"
+          class="text-2xl font-bold gradient-text hover:opacity-80 transition-opacity block"
+        >
+          local.llm
+        </a>
       </div>
 
-      <!-- Mobile Menu -->
-      <div *ngIf="mobileMenuOpen()" class="md:hidden border-t border-slate-800">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      <!-- Navigation Links -->
+      <div class="flex-1 overflow-y-auto py-6">
+        <div class="space-y-2 px-4">
           <a
             routerLink="/apps"
-            routerLinkActive="bg-slate-800 text-primary"
-            (click)="mobileMenuOpen.set(false)"
-            class="text-slate-300 hover:bg-slate-800 hover:text-slate-100 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-250"
+            routerLinkActive="bg-gray-900 text-primary border-l-4 border-primary"
+            class="text-gray-300 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-lg font-medium transition-colors duration-250 border-l-4 border-transparent"
           >
             Apps
           </a>
           <a
             routerLink="/friends"
-            routerLinkActive="bg-slate-800 text-primary"
-            (click)="mobileMenuOpen.set(false)"
-            class="text-slate-300 hover:bg-slate-800 hover:text-slate-100 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-250"
+            routerLinkActive="bg-gray-900 text-primary border-l-4 border-primary"
+            class="text-gray-300 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-lg font-medium transition-colors duration-250 border-l-4 border-transparent"
           >
             Friends
           </a>
           <a
             routerLink="/credits"
-            routerLinkActive="bg-slate-800 text-primary"
-            (click)="mobileMenuOpen.set(false)"
-            class="text-slate-300 hover:bg-slate-800 hover:text-slate-100 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-250"
+            routerLinkActive="bg-gray-900 text-primary border-l-4 border-primary"
+            class="text-gray-300 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-lg font-medium transition-colors duration-250 border-l-4 border-transparent"
           >
             Credits
           </a>
           <a
             routerLink="/settings"
-            routerLinkActive="bg-slate-800 text-primary"
-            (click)="mobileMenuOpen.set(false)"
-            class="text-slate-300 hover:bg-slate-800 hover:text-slate-100 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-250"
+            routerLinkActive="bg-gray-900 text-primary border-l-4 border-primary"
+            class="text-gray-300 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-lg font-medium transition-colors duration-250 border-l-4 border-transparent"
           >
             Settings
           </a>
         </div>
       </div>
+
+      <!-- User Menu -->
+      <div class="border-t border-gray-800 px-4 py-6">
+        <button
+          class="w-full flex items-center justify-center p-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary transition-colors duration-250"
+        >
+          <svg
+            class="h-6 w-6"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Close Button -->
+      <div class="md:hidden px-4 pb-4">
+        <button
+          (click)="sidebarOpen.set(false)"
+          class="w-full flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary transition-colors duration-250"
+        >
+          <svg
+            class="h-6 w-6"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
     </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div
+      *ngIf="sidebarOpen()"
+      (click)="sidebarOpen.set(false)"
+      class="fixed inset-0 bg-black/50 z-40 md:hidden"
+    ></div>
+
+    <!-- Mobile Menu Button (in header) -->
+    <div class="fixed top-0 right-0 z-50 md:hidden p-4">
+      <button
+        (click)="sidebarOpen.set(!sidebarOpen())"
+        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary transition-colors duration-250"
+      >
+        <svg
+          class="h-6 w-6"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+    </div>
   `,
 })
 export class NavigationComponent {
-  mobileMenuOpen = signal(false);
+  sidebarOpen = signal(false);
 }
