@@ -8,15 +8,15 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
     <nav
-      class="w-64 bg-black border-r border-gray-800 flex flex-col h-full fixed left-0 top-0 bottom-0 z-50 md:relative md:z-auto md:sticky md:top-0 transition-transform duration-300 ease-in-out"
+      class="w-64 bg-black border-r border-gray-700 flex flex-col h-full fixed left-0 top-0 bottom-0 z-50 md:relative md:z-auto md:sticky md:top-0 transition-transform duration-300 ease-in-out"
       [class.translate-x-0]="sidebarOpen() || !isMobile()"
       [class.-translate-x-full]="!sidebarOpen() && isMobile()"
     >
       <!-- Logo Section -->
-      <div class="px-6 py-8 border-b border-gray-800">
+      <div class="px-6 py-8 border-b border-gray-700">
         <a
           routerLink="/"
-          class="text-2xl font-bold gradient-text hover:opacity-80 transition-opacity block"
+          class="text-2xl font-semibold text-white hover:text-gray-300 transition-colors block"
         >
           local.llm
         </a>
@@ -24,32 +24,32 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
 
       <!-- Navigation Links -->
       <div class="flex-1 overflow-y-auto py-6">
-        <div class="space-y-2 px-4">
+        <div class="space-y-1 px-4">
           <a
             routerLink="/apps"
-            routerLinkActive="bg-gray-900 text-primary border-l-4 border-primary"
-            class="text-gray-300 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-lg font-medium transition-colors duration-250 border-l-4 border-transparent"
+            routerLinkActive="text-white bg-gray-900"
+            class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
           >
             Apps
           </a>
           <a
             routerLink="/friends"
-            routerLinkActive="bg-gray-900 text-primary border-l-4 border-primary"
-            class="text-gray-300 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-lg font-medium transition-colors duration-250 border-l-4 border-transparent"
+            routerLinkActive="text-white bg-gray-900"
+            class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
           >
             Friends
           </a>
           <a
             routerLink="/credits"
-            routerLinkActive="bg-gray-900 text-primary border-l-4 border-primary"
-            class="text-gray-300 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-lg font-medium transition-colors duration-250 border-l-4 border-transparent"
+            routerLinkActive="text-white bg-gray-900"
+            class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
           >
             Credits
           </a>
           <a
             routerLink="/settings"
-            routerLinkActive="bg-gray-900 text-primary border-l-4 border-primary"
-            class="text-gray-300 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-lg font-medium transition-colors duration-250 border-l-4 border-transparent"
+            routerLinkActive="text-white bg-gray-900"
+            class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
           >
             Settings
           </a>
@@ -57,9 +57,9 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
       </div>
 
       <!-- User Menu -->
-      <div class="border-t border-gray-800 px-4 py-6">
+      <div class="border-t border-gray-700 px-4 py-6">
         <button
-          class="w-full flex items-center justify-center p-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary transition-colors duration-250"
+          class="w-full flex items-center justify-center p-3 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-700 transition-colors duration-200"
         >
           <svg
             class="h-6 w-6"
