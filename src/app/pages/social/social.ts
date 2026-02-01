@@ -25,7 +25,7 @@ interface Post {
         <!-- Header -->
         <div class="mb-8">
           <h1 class="section-title">Social Media Simulator</h1>
-          <p class="text-slate-400">
+          <p class="text-gray-400">
             Explore AI-generated social interactions powered by local LLMs
           </p>
         </div>
@@ -97,11 +97,11 @@ interface Post {
             <div class="flex items-start gap-4 mb-4">
               <div class="text-3xl flex-shrink-0">{{ post.avatar }}</div>
               <div class="flex-grow min-w-0">
-                <p class="font-bold text-slate-100">{{ post.author }}</p>
-                <p class="text-sm text-slate-500">{{ post.timestamp }}</p>
+                <p class="font-bold text-gray-100">{{ post.author }}</p>
+                <p class="text-sm text-gray-500">{{ post.timestamp }}</p>
               </div>
               <button
-                class="text-slate-400 hover:text-slate-100 transition-colors"
+                class="text-gray-400 hover:text-gray-100 transition-colors"
               >
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path
@@ -112,13 +112,13 @@ interface Post {
             </div>
 
             <!-- Post Content -->
-            <p class="text-slate-100 mb-4 leading-relaxed">
+            <p class="text-gray-100 mb-4 leading-relaxed">
               {{ post.content }}
             </p>
 
             <!-- Post Stats -->
             <div
-              class="flex gap-4 text-sm text-slate-400 mb-4 py-3 border-t border-b border-slate-800"
+              class="flex gap-4 text-sm text-gray-400 mb-4 py-3 border-t border-b border-gray-800"
             >
               <span>{{ post.likes }} likes</span>
               <span>{{ post.comments }} comments</span>
@@ -129,7 +129,7 @@ interface Post {
               <button
                 (click)="toggleLike(post.id)"
                 [class.text-primary]="post.isLiked"
-                class="flex-1 flex items-center justify-center gap-2 text-slate-400 hover:text-primary hover:bg-primary/5 py-2 rounded transition-colors duration-250"
+                class="flex-1 flex items-center justify-center gap-2 text-gray-400 hover:text-primary hover:bg-primary/5 py-2 rounded transition-colors duration-250"
               >
                 <svg
                   class="w-5 h-5"
@@ -147,7 +147,7 @@ interface Post {
                 Like
               </button>
               <button
-                class="flex-1 flex items-center justify-center gap-2 text-slate-400 hover:text-secondary hover:bg-secondary/5 py-2 rounded transition-colors duration-250"
+                class="flex-1 flex items-center justify-center gap-2 text-gray-400 hover:text-secondary hover:bg-secondary/5 py-2 rounded transition-colors duration-250"
               >
                 <svg
                   class="w-5 h-5"
@@ -165,7 +165,7 @@ interface Post {
                 Comment
               </button>
               <button
-                class="flex-1 flex items-center justify-center gap-2 text-slate-400 hover:text-success hover:bg-success/5 py-2 rounded transition-colors duration-250"
+                class="flex-1 flex items-center justify-center gap-2 text-gray-400 hover:text-success hover:bg-success/5 py-2 rounded transition-colors duration-250"
               >
                 <svg
                   class="w-5 h-5"
