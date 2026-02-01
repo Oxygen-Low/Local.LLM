@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { RouterOutlet, Router, NavigationStart } from "@angular/router";
+import { RouterOutlet, Router, NavigationEnd, NavigationStart } from "@angular/router";
 import { NavigationComponent } from "./components/navigation";
 import { CommonModule } from "@angular/common";
 import { filter } from "rxjs/operators";
@@ -17,14 +17,23 @@ export class App implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    // Initialize navigation visibility based on current URL
-    this.updateNavigation(this.router.url);
+    // Initialize navigation visibility
+    setTimeout(() => {
+      this.updateNavigation(this.router.url || "/");
+    }, 0);
 
-    // Update navigation visibility on route changes
+    // Update on navigation start
     this.router.events
       .pipe(filter((event) => event instanceof NavigationStart))
       .subscribe((event: any) => {
         this.updateNavigation(event.url);
+      });
+
+    // Also update on navigation end as fallback
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.updateNavigation(event.urlAfterRedirects);
       });
   }
 
