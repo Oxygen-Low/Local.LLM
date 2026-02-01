@@ -25,7 +25,7 @@ interface FriendRequest {
   imports: [CommonModule, FormsModule],
   template: `
     <div
-      class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8"
+      class="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8"
     >
       <div class="max-w-5xl mx-auto">
         <!-- Header -->
