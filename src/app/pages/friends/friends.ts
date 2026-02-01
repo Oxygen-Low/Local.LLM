@@ -56,7 +56,7 @@ interface FriendRequest {
 
         <!-- Friend Requests Section -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold text-slate-100 mb-6">
+          <h2 class="text-2xl font-bold text-gray-100 mb-6">
             Friend Requests ({{ friendRequests.length }})
           </h2>
 
