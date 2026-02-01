@@ -62,7 +62,7 @@ interface FriendRequest {
 
           <div *ngIf="friendRequests.length === 0" class="card p-8 text-center">
             <div class="text-4xl mb-3">📬</div>
-            <p class="text-slate-400">No pending friend requests</p>
+            <p class="text-gray-400">No pending friend requests</p>
           </div>
 
           <!-- Incoming Requests -->
@@ -172,7 +172,7 @@ interface FriendRequest {
 
           <div *ngIf="friends.length === 0" class="card p-8 text-center">
             <div class="text-4xl mb-3">👥</div>
-            <p class="text-slate-400">You haven't added any friends yet</p>
+            <p class="text-gray-400">You haven't added any friends yet</p>
             <button
               (click)="showAddFriendModal.set(true)"
               class="btn-primary mt-4"
