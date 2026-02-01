@@ -17,16 +17,15 @@ export class App implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.updateNavigation();
+    // Hide navigation on home and auth routes
+    const updateNavigation = () => {
+      const url = this.router.url || "/";
+      this.showNavigation = url !== "/" && !url.startsWith("/auth");
+    };
+
+    updateNavigation();
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.updateNavigation();
-      });
-  }
-
-  private updateNavigation() {
-    const url = this.router.url;
-    this.showNavigation = url !== "/" && !url.startsWith("/auth");
+      .subscribe(updateNavigation);
   }
 }
