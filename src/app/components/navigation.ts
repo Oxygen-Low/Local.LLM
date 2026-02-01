@@ -106,14 +106,14 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
     <div
       *ngIf="sidebarOpen()"
       (click)="sidebarOpen.set(false)"
-      class="fixed inset-0 bg-black/50 z-40 md:hidden"
+      class="fixed inset-0 bg-black/40 z-40 md:hidden"
     ></div>
 
     <!-- Mobile Menu Button (in header) -->
     <div class="fixed top-0 right-0 z-50 md:hidden p-4">
       <button
         (click)="sidebarOpen.set(!sidebarOpen())"
-        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary transition-colors duration-250"
+        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-700 transition-colors duration-200"
       >
         <svg
           class="h-6 w-6"
