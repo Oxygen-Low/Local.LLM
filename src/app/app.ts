@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, signal } from "@angular/core";
 import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { NavigationComponent } from "./components/navigation";
 import { CommonModule } from "@angular/common";
@@ -12,32 +12,25 @@ import { filter } from "rxjs/operators";
   styleUrl: "./app.css",
 })
 export class App implements OnInit {
-  showNavigation = true;
+  showNavigation = signal(true);
 
   constructor(private router: Router) {}
 
   ngOnInit() {
+    // Set initial state
+    this.updateNavigationVisibility(this.router.url);
+
     // Subscribe to route changes
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        // Get current route
-        const currentRoute = this.router.url;
-        console.log("Route changed to:", currentRoute); // Debug
-
-        // Hide navigation on home and auth pages
-        if (currentRoute === "/" || currentRoute.startsWith("/auth")) {
-          this.showNavigation = false;
-        } else {
-          this.showNavigation = true;
-        }
+      .subscribe((event: any) => {
+        this.updateNavigationVisibility(event.url);
       });
+  }
 
-    // Set initial state
-    const initialRoute = this.router.url;
-    console.log("Initial route:", initialRoute); // Debug
-    if (initialRoute === "/" || initialRoute.startsWith("/auth")) {
-      this.showNavigation = false;
-    }
+  private updateNavigationVisibility(url: string) {
+    // Hide navigation on home ("/") and auth routes
+    const hide = url === "/" || url.startsWith("/auth");
+    this.showNavigation.set(!hide);
   }
 }
