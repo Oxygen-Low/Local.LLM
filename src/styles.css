@@ -89,7 +89,7 @@
 
 @layer utilities {
   .glass-effect {
-    @apply bg-slate-900/50 backdrop-blur-md border border-slate-800/50;
+    @apply bg-gray-900/50 backdrop-blur-md border border-gray-800/50;
   }
 
   .gradient-text {
