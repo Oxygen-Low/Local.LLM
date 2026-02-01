@@ -76,10 +76,10 @@ interface FriendRequest {
                 <div class="flex items-center gap-4">
                   <div class="text-4xl">{{ request.avatar }}</div>
                   <div>
-                    <p class="font-semibold text-slate-100">
+                    <p class="font-semibold text-gray-100">
                       {{ request.username }}
                     </p>
-                    <p class="text-sm text-slate-500">
+                    <p class="text-sm text-gray-500">
                       Requested {{ request.timestamp }}
                     </p>
                   </div>
@@ -133,10 +133,10 @@ interface FriendRequest {
                 <div class="flex items-center gap-4">
                   <div class="text-4xl">{{ request.avatar }}</div>
                   <div>
-                    <p class="font-semibold text-slate-100">
+                    <p class="font-semibold text-gray-100">
                       {{ request.username }}
                     </p>
-                    <p class="text-sm text-slate-500">
+                    <p class="text-sm text-gray-500">
                       Sent {{ request.timestamp }}
                     </p>
                   </div>
@@ -166,7 +166,7 @@ interface FriendRequest {
 
         <!-- Friends List Section -->
         <div>
-          <h2 class="text-2xl font-bold text-slate-100 mb-6">
+          <h2 class="text-2xl font-bold text-gray-100 mb-6">
             Friends ({{ friends.length }})
           </h2>
 
@@ -198,10 +198,10 @@ interface FriendRequest {
                   ></div>
                 </div>
                 <div class="flex-grow">
-                  <p class="font-semibold text-slate-100">
+                  <p class="font-semibold text-gray-100">
                     {{ friend.username }}
                   </p>
-                  <p class="text-sm text-slate-500">
+                  <p class="text-sm text-gray-500">
                     {{ getStatusText(friend.status, friend.lastSeen) }}
                   </p>
                 </div>
@@ -229,7 +229,7 @@ interface FriendRequest {
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       >
         <div class="card p-8 max-w-md w-full">
-          <h3 class="text-xl font-bold text-slate-100 mb-6">Add Friend</h3>
+          <h3 class="text-xl font-bold text-gray-100 mb-6">Add Friend</h3>
 
           <div class="space-y-4 mb-6">
             <div>
@@ -247,11 +247,11 @@ interface FriendRequest {
             <div class="max-h-64 overflow-y-auto space-y-2">
               <div
                 *ngFor="let user of searchResults()"
-                class="p-3 bg-slate-800 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors flex items-center justify-between"
+                class="p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors flex items-center justify-between"
               >
                 <div class="flex items-center gap-2">
                   <span class="text-2xl">👤</span>
-                  <span class="text-slate-100">{{ user }}</span>
+                  <span class="text-gray-100">{{ user }}</span>
                 </div>
                 <button
                   (click)="sendFriendRequest(user)"
@@ -267,7 +267,7 @@ interface FriendRequest {
 
               <div
                 *ngIf="searchResults().length === 0 && searchUsername"
-                class="text-center py-6 text-slate-500"
+                class="text-center py-6 text-gray-500"
               >
                 No users found
               </div>
@@ -397,9 +397,9 @@ export class FriendsListComponent {
       case "away":
         return "bg-warning";
       case "offline":
-        return "bg-slate-600";
+        return "bg-gray-600";
       default:
-        return "bg-slate-600";
+        return "bg-gray-600";
     }
   }
 
