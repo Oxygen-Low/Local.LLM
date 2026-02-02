@@ -57,7 +57,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
       </div>
 
       <!-- User Menu -->
-      <div class="border-t border-gray-700 px-4 py-6">
+      <div class="px-4 py-6">
         <button
           class="w-full flex items-center justify-center p-3 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-700 transition-colors duration-200"
         >
