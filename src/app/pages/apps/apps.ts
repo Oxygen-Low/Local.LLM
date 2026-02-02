@@ -77,7 +77,7 @@ interface App {
 
             <!-- Stats -->
             <div
-              class="grid grid-cols-2 gap-4 mb-6 py-4 border-t border-b border-gray-800"
+              class="grid grid-cols-2 gap-4 mb-6 py-4"
             >
               <div>
                 <p class="text-xs text-gray-500 mb-1">Credits Used</p>
