@@ -29,8 +29,8 @@ export class App implements OnInit {
   }
 
   private updateNavigationVisibility(url: string) {
-    // Hide navigation on the about page ("/") and auth routes
-    const isAboutPage = url === "/";
+    // Hide navigation on the about page ("/about" or "/") and auth routes
+    const isAboutPage = url === "/" || url.startsWith("/about");
     const isAuthPage = url.startsWith("/auth");
     this.showNavigation.set(!(isAboutPage || isAuthPage));
   }
