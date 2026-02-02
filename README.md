@@ -21,9 +21,9 @@ You can switch between them in the .env file by setting local to true.
 
 Either do the automatic installation (via the Oxygen Low's Software app), or follow the instructions below:
 
-1. Clone the repository (git clone https://github.com/Oxygen-Low/Local.LLM)
-2. Run npm install
-3. Run npm start
+1. Clone the repository (`git clone https://github.com/Oxygen-Low/Local.LLM`)
+2. Run `npm install`
+3. Run `npm start`
 
 ## Extra Information
 Local.LLM is made and developed by Oxygen Low's Software, and is also available in the Oxygen Low's Software app for installation and usage under the utilities category.
