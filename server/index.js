@@ -3,6 +3,8 @@ const express = require('express');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
+const PgSession = require('connect-pg-simple')(session);
+const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
@@ -26,8 +28,20 @@ app.use(cors({
   credentials: true
 }));
 
+// Rate limiting configuration
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 requests per windowMs
+  message: { error: 'Too many attempts, please try again later' }
+});
+
 // Session configuration
 app.use(session({
+  store: new PgSession({
+    pool: pool,
+    tableName: 'session',
+    createTableIfMissing: true
+  }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -35,7 +49,7 @@ app.use(session({
   cookie: {
     maxAge: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
     httpOnly: true,
-    secure: false, // Set to true if using HTTPS
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax'
   }
 }));
@@ -56,10 +70,28 @@ async function initDb() {
 initDb().catch(err => console.error('Error initializing database:', err));
 
 // Routes
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', authLimiter, async (req, res) => {
   const { username, password } = req.body;
+
+  // Validation
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password required' });
+  }
+
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  if (!usernameRegex.test(username)) {
+    return res.status(400).json({
+      error: 'Username must be 3-20 characters long and contain only letters, numbers, and underscores'
+    });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+  }
+
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).+$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ error: 'Password must contain at least one letter and one number' });
   }
 
   try {
@@ -78,7 +110,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', authLimiter, async (req, res) => {
   const { username, password } = req.body;
   try {
     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
