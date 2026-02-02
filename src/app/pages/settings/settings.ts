@@ -18,7 +18,7 @@ interface LLMProvider {
   template: `
     <div
       class="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
-      style="background-color: #808080;"
+      style="background-color: #282828;"
     >
       <div class="max-w-4xl mx-auto">
         <!-- Header -->

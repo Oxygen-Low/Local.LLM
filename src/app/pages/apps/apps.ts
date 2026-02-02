@@ -20,7 +20,7 @@ interface App {
   template: `
     <div
       class="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
-      style="background-color: #5a5a5a;"
+      style="background-color: #282828;"
     >
       <div class="max-w-7xl mx-auto">
         <!-- Header -->

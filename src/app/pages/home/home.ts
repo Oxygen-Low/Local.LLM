@@ -12,7 +12,7 @@ import { RouterLink } from "@angular/router";
       class="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       <!-- Gradient Background -->
-      <div class="absolute inset-0" style="background-color: #808080;"></div>
+      <div class="absolute inset-0" style="background-color: #282828;"></div>
       <div
         class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl opacity-20"
       ></div>
