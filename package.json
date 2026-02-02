@@ -20,22 +20,27 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "^20.1.0",
-    "@angular/compiler": "^20.1.0",
-    "@angular/core": "^20.1.0",
-    "@angular/forms": "^20.1.0",
-    "@angular/platform-browser": "^20.1.0",
-    "@angular/router": "^20.1.0",
+    "@angular/common": "^20.3.16",
+    "@angular/compiler": "^20.3.16",
+    "@angular/core": "^20.3.16",
+    "@angular/forms": "^20.3.16",
+    "@angular/platform-browser": "^20.3.16",
+    "@angular/router": "^20.3.16",
     "postcss": "^8.5.6",
     "rxjs": "~7.8.0",
     "tailwindcss": "^3.4.11",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
+  "overrides": {
+    "sucrase": {
+      "glob": "^10.5.0"
+    }
+  },
   "devDependencies": {
-    "@angular/build": "^20.1.2",
-    "@angular/cli": "^20.1.2",
-    "@angular/compiler-cli": "^20.1.0",
+    "@angular/build": "^20.3.15",
+    "@angular/cli": "^20.3.15",
+    "@angular/compiler-cli": "^20.3.16",
     "@tailwindcss/typography": "^0.5.16",
     "@types/jasmine": "~5.1.0",
     "autoprefixer": "^10.4.21",
