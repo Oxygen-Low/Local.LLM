@@ -13,7 +13,7 @@ import { RouterLink } from "@angular/router";
     >
       <!-- Gradient Background -->
       <div
-        class="absolute inset-0 bg-black"
+        class="absolute inset-0 bg-gray-900"
       ></div>
       <div
         class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl opacity-20"
