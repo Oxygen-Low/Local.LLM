@@ -1,6 +1,8 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+import { Router } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: "app-auth",
@@ -118,18 +120,28 @@ export class AuthComponent {
   message = "";
   isSignup = false;
 
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
+
   onSubmit() {
     if (!this.username || !this.password) {
       this.message = "Please fill in all fields";
       return;
     }
 
-    // Placeholder authentication logic
+    this.authService.login(this.username);
+
     if (this.isSignup) {
-      this.message = `Signup attempt: ${this.username}`;
+      this.message = `Account created! Redirecting...`;
     } else {
-      this.message = `Login attempt: ${this.username}`;
+      this.message = `Welcome back! Redirecting...`;
     }
+
+    setTimeout(() => {
+      this.router.navigate(["/apps"]);
+    }, 1000);
   }
 
   toggleMode() {

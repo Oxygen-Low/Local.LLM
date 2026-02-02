@@ -1,0 +1,29 @@
+
+> fusion-angular-tailwind-starter@0.0.0 start
+> ng serve
+
+❯ Building...
+✔ Building...
+Initial chunk files | Names         |  Raw size
+styles.css          | styles        |  26.69 kB |
+main.js             | main          |  19.59 kB |
+chunk-6WVFWWRM.js   | -             |   1.28 kB |
+chunk-PZ5AY32C.js   | -             | 234 bytes |
+polyfills.js        | polyfills     |  95 bytes |
+
+                    | Initial total |  47.89 kB
+
+Lazy chunk files    | Names         |  Raw size
+chunk-7U4ZZG2T.js   | settings      |  52.19 kB |
+chunk-2IMTT7NI.js   | friends       |  33.08 kB |
+chunk-2PAVYZCM.js   | social        |  22.36 kB |
+chunk-QCCESGS6.js   | credits       |  21.18 kB |
+chunk-Q5H6H7MF.js   | apps          |  18.25 kB |
+chunk-JVB2PGUH.js   | auth          |  13.25 kB |
+chunk-DTNGGPK6.js   | home          |   9.39 kB |
+
+Application bundle generation complete. [3.627 seconds] - 2026-02-02T01:08:56.491Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  ➜  Local:   http://localhost:4200/
