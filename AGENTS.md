@@ -1,7 +1,3 @@
-# Fusion Angular Tailwind Starter
-
-A production-ready Angular application template with TypeScript, TailwindCSS 3, and modern tooling.
-
 ## Tech Stack
 
 - **Frontend**: Angular 20 + TypeScript + TailwindCSS 3.4.11
