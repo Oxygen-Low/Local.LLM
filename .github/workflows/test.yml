@@ -13,18 +13,49 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: localllm
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          cd server && npm install
+
+      - name: Start backend
+        run: |
+          cd server
+          cat <<EOF > .env
+          DB_USER=user
+          DB_PASSWORD=password
+          DB_HOST=localhost
+          DB_NAME=localllm
+          DB_PORT=5432
+          SESSION_SECRET=super-secret-key
+          PORT=3000
+          EOF
+          node index.js &
 
       - name: Build website
         run: npm run build
@@ -32,8 +63,8 @@ jobs:
       - name: Start website
         run: npm start &
 
-      - name: Wait for website
-        run: npx wait-on http://localhost:4200 --timeout 60000
+      - name: Wait for services
+        run: npx wait-on http://localhost:4200 http://localhost:3000/api/status --timeout 60000
 
       - name: Run tests
         run: npm test -- --watch=false --browsers=ChromeHeadless

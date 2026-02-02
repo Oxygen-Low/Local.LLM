@@ -2,6 +2,7 @@ import { Component, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
 
 type SettingsTab = "llm" | "account";
 
@@ -111,11 +112,11 @@ interface LLMProvider {
 
             <!-- Dynamic Form Fields Based on Provider -->
             <div
-              *ngIf="selectedProvider() && selectedProvider() !== 'built-in'"
+              *ngIf="selectedProvider && selectedProvider !== 'built-in'"
               class="space-y-6 pt-6 border-t border-gray-800"
             >
               <!-- Ollama Fields -->
-              <ng-container *ngIf="selectedProvider() === 'ollama'">
+              <ng-container *ngIf="selectedProvider === 'ollama'">
                 <div>
                   <label class="block text-sm font-medium text-gray-300 mb-2">
                     Ollama Base URL
@@ -133,7 +134,7 @@ interface LLMProvider {
               </ng-container>
 
               <!-- OpenAI Fields -->
-              <ng-container *ngIf="selectedProvider() === 'openai'">
+              <ng-container *ngIf="selectedProvider === 'openai'">
                 <div>
                   <label class="block text-sm font-medium text-gray-300 mb-2">
                     API Key
@@ -151,7 +152,7 @@ interface LLMProvider {
               </ng-container>
 
               <!-- OpenRouter Fields -->
-              <ng-container *ngIf="selectedProvider() === 'openrouter'">
+              <ng-container *ngIf="selectedProvider === 'openrouter'">
                 <div>
                   <label class="block text-sm font-medium text-gray-300 mb-2">
                     API Key
@@ -180,7 +181,7 @@ interface LLMProvider {
               </ng-container>
 
               <!-- Deepseek Fields -->
-              <ng-container *ngIf="selectedProvider() === 'deepseek'">
+              <ng-container *ngIf="selectedProvider === 'deepseek'">
                 <div>
                   <label class="block text-sm font-medium text-gray-300 mb-2">
                     API Key
@@ -198,7 +199,7 @@ interface LLMProvider {
               </ng-container>
 
               <!-- Claude/Anthropic Fields -->
-              <ng-container *ngIf="selectedProvider() === 'claude'">
+              <ng-container *ngIf="selectedProvider === 'claude'">
                 <div>
                   <label class="block text-sm font-medium text-gray-300 mb-2">
                     API Key
@@ -238,7 +239,7 @@ interface LLMProvider {
 
             <!-- Built-in Information -->
             <div
-              *ngIf="selectedProvider() === 'built-in'"
+              *ngIf="selectedProvider === 'built-in'"
               class="p-6 bg-primary/5 border border-primary/20 rounded-lg mt-6"
             >
               <div class="flex items-start gap-3">
@@ -398,6 +399,27 @@ interface LLMProvider {
             </div>
           </div>
 
+          <!-- Logout -->
+          <div class="card p-8">
+            <h2 class="text-2xl font-bold text-gray-100 mb-6">Session</h2>
+            <button (click)="logout()" class="btn-secondary w-full justify-center">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+              Sign Out
+            </button>
+          </div>
+
           <!-- Data Management -->
           <div class="card p-8 border-error/20">
             <h2 class="text-2xl font-bold text-gray-100 mb-6">
@@ -500,7 +522,9 @@ interface LLMProvider {
 })
 export class SettingsComponent {
   activeTab = signal<SettingsTab>("llm");
-  selectedProvider = signal("");
+  selectedProvider = "";
+
+  constructor(private authService: AuthService) {}
   showNotification = signal(false);
   notificationMessage = signal("");
   showDeleteModal = signal(false);
@@ -562,7 +586,7 @@ export class SettingsComponent {
 
   getProviderDescription(): string {
     const provider = this.llmProviders.find(
-      (p) => p.id === this.selectedProvider(),
+      (p) => p.id === this.selectedProvider,
     );
     return provider?.description || "";
   }
@@ -597,6 +621,10 @@ export class SettingsComponent {
   confirmAccountDeletion(): void {
     this.showDeleteModal.set(false);
     this.showMessage("Account deletion request submitted!");
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   private showMessage(message: string): void {
