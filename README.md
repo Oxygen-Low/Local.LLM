@@ -12,11 +12,15 @@ Local.LLM is a community-focused LLM platform, featuring many apps and quick upd
 ## Setup
 
 There are 2 different types of self-hosted servers:
+
 Local - No credits system, certain apps accessible.
+
 Non-Local - Credits system, certain apps inaccessible (this is the type our hosted server uses).
+
 You can switch between them in the .env file by setting local to true.
 
 Either do the automatic installation (via the Oxygen Low's Software app), or follow the instructions below:
+
 1. Clone the repository (git clone https://github.com/Oxygen-Low/Local.LLM)
 2. Run npm install
 3. Run npm start
