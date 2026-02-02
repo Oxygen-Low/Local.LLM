@@ -7,11 +7,18 @@ import { FormsModule } from "@angular/forms";
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen flex items-center justify-center px-4" style="background-color: #808080;">
+    <div
+      class="min-h-screen flex items-center justify-center px-4"
+      style="background-color: #808080;"
+    >
       <!-- Animated Background Elements -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl opacity-20"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-secondary/10 rounded-full filter blur-3xl opacity-20"></div>
+        <div
+          class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl opacity-20"
+        ></div>
+        <div
+          class="absolute bottom-0 left-0 w-96 h-96 bg-secondary/10 rounded-full filter blur-3xl opacity-20"
+        ></div>
       </div>
 
       <!-- Auth Card -->
@@ -20,10 +27,12 @@ import { FormsModule } from "@angular/forms";
           <!-- Header -->
           <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-100 mb-2">
-              {{ isSignup ? 'Create Account' : 'Welcome Back' }}
+              {{ isSignup ? "Create Account" : "Welcome Back" }}
             </h1>
             <p class="text-gray-400">
-              {{ isSignup ? 'Create a new account' : 'Sign in to your account' }}
+              {{
+                isSignup ? "Create a new account" : "Sign in to your account"
+              }}
             </p>
           </div>
 
@@ -31,7 +40,10 @@ import { FormsModule } from "@angular/forms";
           <form (ngSubmit)="onSubmit()" class="space-y-6">
             <!-- Username Field -->
             <div>
-              <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                for="username"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Username
               </label>
               <input
@@ -47,7 +59,10 @@ import { FormsModule } from "@angular/forms";
 
             <!-- Password Field -->
             <div>
-              <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                for="password"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Password
               </label>
               <input
@@ -66,14 +81,16 @@ import { FormsModule } from "@angular/forms";
               type="submit"
               class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
             >
-              {{ isSignup ? 'Create Account' : 'Sign In' }}
+              {{ isSignup ? "Create Account" : "Sign In" }}
             </button>
           </form>
 
           <!-- Toggle Mode -->
           <div class="mt-6 text-center">
             <p class="text-gray-400 text-sm">
-              {{ isSignup ? "Already have an account?" : "Don't have an account?" }}
+              {{
+                isSignup ? "Already have an account?" : "Don't have an account?"
+              }}
               <button
                 (click)="toggleMode()"
                 class="text-primary hover:text-primary/80 font-semibold transition"
@@ -84,7 +101,10 @@ import { FormsModule } from "@angular/forms";
           </div>
 
           <!-- Message -->
-          <div *ngIf="message" class="mt-6 p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+          <div
+            *ngIf="message"
+            class="mt-6 p-4 bg-gray-700/50 rounded-lg border border-gray-600"
+          >
             <p class="text-gray-300 text-sm text-center">{{ message }}</p>
           </div>
         </div>

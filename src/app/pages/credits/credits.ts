@@ -93,9 +93,7 @@ interface DailyLimit {
 
         <!-- Usage Breakdown -->
         <div class="card p-8">
-          <h2 class="text-2xl font-bold text-gray-100 mb-8">
-            Usage Breakdown
-          </h2>
+          <h2 class="text-2xl font-bold text-gray-100 mb-8">Usage Breakdown</h2>
 
           <!-- Stats Summary -->
           <div

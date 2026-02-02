@@ -77,9 +77,7 @@ interface App {
             </div>
 
             <!-- Stats -->
-            <div
-              class="grid grid-cols-2 gap-4 mb-6 py-4"
-            >
+            <div class="grid grid-cols-2 gap-4 mb-6 py-4">
               <div>
                 <p class="text-xs text-gray-500 mb-1">Credits Used</p>
                 <p class="text-sm font-semibold text-gray-100">
@@ -133,9 +131,7 @@ interface App {
         <div *ngIf="filteredApps().length === 0" class="text-center py-12">
           <div class="text-5xl mb-4">📦</div>
           <h3 class="text-2xl font-bold text-gray-100 mb-2">No apps found</h3>
-          <p class="text-gray-400 mb-6">
-            Try adjusting your search or filters
-          </p>
+          <p class="text-gray-400 mb-6">Try adjusting your search or filters</p>
         </div>
       </div>
     </div>
