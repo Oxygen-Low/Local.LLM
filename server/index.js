@@ -22,7 +22,7 @@ const pool = new Pool({
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:4200', // Default Angular port
+  origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
   credentials: true
 }));
 
