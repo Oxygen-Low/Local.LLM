@@ -39,7 +39,7 @@
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-4 py-2.5 bg-transparent text-gray-300 font-medium rounded-lg border border-gray-600 hover:bg-gray-900 hover:border-gray-500 transition-all duration-200;
+    @apply inline-flex items-center justify-center px-4 py-2.5 bg-transparent text-gray-300 font-medium rounded-lg hover:bg-gray-800 transition-all duration-200;
   }
 
   .btn-small {
@@ -47,11 +47,11 @@
   }
 
   .card {
-    @apply bg-black border border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-600;
+    @apply bg-gray-800 rounded-lg overflow-hidden transition-all duration-200 hover:bg-gray-700;
   }
 
   .card-hover {
-    @apply hover:bg-gray-950;
+    @apply hover:bg-gray-700;
   }
 
   .section-title {
@@ -63,7 +63,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 bg-gray-900 border border-gray-600 text-gray-100 rounded-lg focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30 transition-all duration-200 placeholder:text-gray-600;
+    @apply w-full px-4 py-2.5 bg-gray-800 text-gray-100 rounded-lg focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-200 placeholder:text-gray-600;
   }
 
   .badge {
