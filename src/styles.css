@@ -4,12 +4,12 @@
 
 @layer base {
   html {
-    background-color: #808080;
+    background-color: #5a5a5a;
     @apply text-gray-100;
   }
 
   body {
-    background-color: #808080;
+    background-color: #5a5a5a;
     @apply min-h-screen;
     font-family:
       -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
