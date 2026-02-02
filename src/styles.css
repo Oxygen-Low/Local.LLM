@@ -4,11 +4,11 @@
 
 @layer base {
   html {
-    @apply bg-black text-gray-100;
+    @apply bg-gray-900 text-gray-100;
   }
 
   body {
-    @apply bg-black min-h-screen;
+    @apply bg-gray-900 min-h-screen;
     font-family:
       -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
       "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
