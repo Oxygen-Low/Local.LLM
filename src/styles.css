@@ -41,7 +41,11 @@
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-4 py-2.5 bg-transparent text-gray-300 font-medium rounded-lg hover:bg-gray-800 transition-all duration-200;
+    @apply inline-flex items-center justify-center px-4 py-2.5 bg-transparent text-gray-300 font-medium rounded-lg transition-all duration-200;
+  }
+
+  .btn-secondary:hover {
+    background-color: #4a4a4a;
   }
 
   .btn-small {
