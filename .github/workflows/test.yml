@@ -24,7 +24,30 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          cd server && npm install
+
+      - name: Start PostgreSQL
+        run: |
+          sudo systemctl start postgresql.service
+          pg_isready
+          sudo -u postgres psql -c "CREATE USER \"user\" WITH PASSWORD 'password';"
+          sudo -u postgres psql -c "CREATE DATABASE localllm OWNER \"user\";"
+
+      - name: Start backend
+        run: |
+          cd server
+          cat <<EOF > .env
+          DB_USER=user
+          DB_PASSWORD=password
+          DB_HOST=localhost
+          DB_NAME=localllm
+          DB_PORT=5432
+          SESSION_SECRET=super-secret-key
+          PORT=3000
+          EOF
+          node index.js &
 
       - name: Build website
         run: npm run build
@@ -33,7 +56,7 @@ jobs:
         run: npm start &
 
       - name: Wait for website
-        run: npx wait-on http://localhost:4200 --timeout 60000
+        run: npx wait-on http://localhost:4200 http://localhost:3000/api/status --timeout 60000
 
       - name: Run tests
         run: npm test -- --watch=false --browsers=ChromeHeadless

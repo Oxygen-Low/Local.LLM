@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap, catchError, map } from 'rxjs/operators';
+import { tap, catchError, map, switchMap } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
 
 export interface User {
@@ -51,10 +51,7 @@ export class AuthService {
 
   register(username: string, password: string): Observable<any> {
     return this.http.post<User>(`${this.apiUrl}/register`, { username, password }, { withCredentials: true }).pipe(
-      tap(() => {
-        // Automatically login after register or just navigate to login
-        this.login(username, password).subscribe();
-      })
+      switchMap(() => this.login(username, password))
     );
   }
 
