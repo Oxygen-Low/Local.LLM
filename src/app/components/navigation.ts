@@ -8,12 +8,12 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
     <nav
-      class="w-64 bg-black border-r border-gray-700 flex flex-col h-full fixed left-0 top-0 bottom-0 z-50 md:relative md:z-auto md:sticky md:top-0 transition-transform duration-300 ease-in-out"
+      class="w-64 bg-black flex flex-col h-full fixed left-0 top-0 bottom-0 z-50 md:relative md:z-auto md:sticky md:top-0 transition-transform duration-300 ease-in-out"
       [class.translate-x-0]="sidebarOpen() || !isMobile()"
       [class.-translate-x-full]="!sidebarOpen() && isMobile()"
     >
       <!-- Logo Section -->
-      <div class="px-6 py-8 border-b border-gray-700">
+      <div class="px-6 py-8">
         <a
           routerLink="/"
           class="text-2xl font-semibold text-white hover:text-gray-300 transition-colors block"
