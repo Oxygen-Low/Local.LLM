@@ -97,7 +97,8 @@
 
 @layer utilities {
   .glass-effect {
-    @apply bg-gray-800/80 backdrop-blur-md;
+    background-color: rgba(74, 74, 74, 0.8);
+    @apply backdrop-blur-md;
   }
 
   .gradient-text {
