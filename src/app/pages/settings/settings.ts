@@ -27,7 +27,7 @@ interface LLMProvider {
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex gap-4 mb-8 border-b border-gray-800">
+        <div class="flex gap-4 mb-8">
           <button
             (click)="activeTab.set('llm')"
             [class.active]="activeTab() === 'llm'"
