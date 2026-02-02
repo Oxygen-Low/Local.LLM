@@ -16,7 +16,7 @@ import { FormsModule } from "@angular/forms";
 
       <!-- Auth Card -->
       <div class="relative z-10 w-full max-w-md">
-        <div class="bg-gray-800/50 backdrop-blur-md border border-gray-700 rounded-2xl p-8 shadow-2xl">
+        <div class="bg-gray-800 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
           <!-- Header -->
           <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-100 mb-2">
