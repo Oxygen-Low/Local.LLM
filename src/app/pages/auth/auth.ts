@@ -9,7 +9,7 @@ import { FormsModule } from "@angular/forms";
   template: `
     <div
       class="min-h-screen flex items-center justify-center px-4"
-      style="background-color: #808080;"
+      style="background-color: #282828;"
     >
       <!-- Animated Background Elements -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
