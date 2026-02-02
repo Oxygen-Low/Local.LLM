@@ -35,6 +35,12 @@ const authLimiter = rateLimit({
   message: { error: 'Too many attempts, please try again later' }
 });
 
+// Validate session secret
+if (!process.env.SESSION_SECRET) {
+  console.error('CRITICAL: SESSION_SECRET is not defined in environment variables');
+  process.exit(1);
+}
+
 // Session configuration
 app.use(session({
   store: new PgSession({
@@ -66,8 +72,6 @@ async function initDb() {
     )
   `);
 }
-
-initDb().catch(err => console.error('Error initializing database:', err));
 
 // Routes
 app.post('/api/register', authLimiter, async (req, res) => {
@@ -146,6 +150,16 @@ app.get('/api/status', (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+async function startServer() {
+  try {
+    await initDb();
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error('Error starting server:', err);
+    process.exit(1);
+  }
+}
+
+startServer();
