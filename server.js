@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
-const { doubleCsrf } = require('csrf-csrf');
+const lusca = require('lusca');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -63,24 +63,10 @@ app.use(session({
   }
 }));
 
-// CSRF protection configuration
-const { generateToken, doubleCsrfProtection } = doubleCsrf({
-  getSecret: () => process.env.SESSION_SECRET,
-  cookieName: "x-csrf-token",
-  cookieOptions: {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-  },
-  getTokenFromRequest: (req) => req.headers["x-csrf-token"],
-});
-
-// CSRF protection middleware
-app.use(doubleCsrfProtection);
+app.use(lusca.csrf());
 
 app.get('/api/csrf-token', (req, res) => {
-  res.json({ csrfToken: generateToken(req, res) });
+  res.json({ csrfToken: res.locals._csrf });
 });
 
 /**
