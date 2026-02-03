@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
+
 
 interface CreditUsage {
   app: string;
@@ -18,12 +18,12 @@ interface DailyLimit {
 @Component({
   selector: "app-credits",
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div
       class="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
       style="background-color: #282828;"
-    >
+      >
       <div class="max-w-6xl mx-auto">
         <!-- Header -->
         <div class="mb-12">
@@ -48,22 +48,24 @@ interface DailyLimit {
             <h2 class="text-2xl font-bold text-gray-100 mb-6">Daily Limits</h2>
 
             <div class="space-y-6">
-              <div *ngFor="let limit of dailyLimits">
-                <div class="flex justify-between items-end mb-2">
-                  <p class="font-medium text-gray-300">{{ limit.model }}</p>
-                  <p class="text-sm text-gray-400">
-                    {{ limit.used }} / {{ limit.limit }}
-                  </p>
-                </div>
-                <div
-                  class="w-full bg-gray-800 rounded-full h-3 overflow-hidden"
-                >
+              @for (limit of dailyLimits; track limit) {
+                <div>
+                  <div class="flex justify-between items-end mb-2">
+                    <p class="font-medium text-gray-300">{{ limit.model }}</p>
+                    <p class="text-sm text-gray-400">
+                      {{ limit.used }} / {{ limit.limit }}
+                    </p>
+                  </div>
                   <div
-                    class="bg-gradient-primary h-full transition-all duration-300"
-                    [style.width.%]="(limit.used / limit.limit) * 100"
-                  ></div>
+                    class="w-full bg-gray-800 rounded-full h-3 overflow-hidden"
+                    >
+                    <div
+                      class="bg-gradient-primary h-full transition-all duration-300"
+                      [style.width.%]="(limit.used / limit.limit) * 100"
+                    ></div>
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
 
@@ -72,17 +74,19 @@ interface DailyLimit {
             <h2 class="text-2xl font-bold text-gray-100 mb-6">Weekly Usage</h2>
 
             <div class="space-y-4">
-              <div *ngFor="let day of weekDays" class="flex items-end gap-3">
-                <p class="w-12 text-sm text-gray-400">{{ day.label }}</p>
-                <div
-                  class="flex-1 bg-gradient-primary rounded-t h-24 transition-all duration-300 hover:opacity-80"
-                  [style.height.%]="(day.usage / 100) * 100"
-                  style="min-height: 4px"
-                ></div>
-                <p class="w-12 text-right text-sm text-gray-400">
-                  {{ day.usage }}
-                </p>
-              </div>
+              @for (day of weekDays; track day) {
+                <div class="flex items-end gap-3">
+                  <p class="w-12 text-sm text-gray-400">{{ day.label }}</p>
+                  <div
+                    class="flex-1 bg-gradient-primary rounded-t h-24 transition-all duration-300 hover:opacity-80"
+                    [style.height.%]="(day.usage / 100) * 100"
+                    style="min-height: 4px"
+                  ></div>
+                  <p class="w-12 text-right text-sm text-gray-400">
+                    {{ day.usage }}
+                  </p>
+                </div>
+              }
             </div>
 
             <p class="text-gray-500 text-xs mt-6 text-center">
@@ -98,7 +102,7 @@ interface DailyLimit {
           <!-- Stats Summary -->
           <div
             class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-4 bg-gray-800/50 rounded-lg"
-          >
+            >
             <div class="text-center">
               <p class="text-sm text-gray-400 mb-1">Total Apps</p>
               <p class="text-3xl font-bold text-primary">6</p>
@@ -133,40 +137,41 @@ interface DailyLimit {
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  *ngFor="let usage of usageBreakdown"
-                  class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors"
-                >
-                  <td class="py-4 px-4">
-                    <div class="flex items-center gap-3">
-                      <span class="text-2xl">{{ usage.icon }}</span>
-                      <div>
-                        <p class="text-gray-100 font-medium">
-                          {{ usage.app }}
-                        </p>
+                @for (usage of usageBreakdown; track usage) {
+                  <tr
+                    class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors"
+                    >
+                    <td class="py-4 px-4">
+                      <div class="flex items-center gap-3">
+                        <span class="text-2xl">{{ usage.icon }}</span>
+                        <div>
+                          <p class="text-gray-100 font-medium">
+                            {{ usage.app }}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td class="py-4 px-4 text-gray-100 font-medium">
-                    {{ usage.credits.toLocaleString() }}
-                  </td>
-                  <td class="py-4 px-4">
-                    <div class="flex items-center gap-2">
-                      <div class="w-24 bg-gray-700 rounded-full h-2">
-                        <div
-                          class="bg-gradient-primary h-full rounded-full"
-                          [style.width.%]="usage.percentage"
-                        ></div>
+                    </td>
+                    <td class="py-4 px-4 text-gray-100 font-medium">
+                      {{ usage.credits.toLocaleString() }}
+                    </td>
+                    <td class="py-4 px-4">
+                      <div class="flex items-center gap-2">
+                        <div class="w-24 bg-gray-700 rounded-full h-2">
+                          <div
+                            class="bg-gradient-primary h-full rounded-full"
+                            [style.width.%]="usage.percentage"
+                          ></div>
+                        </div>
+                        <span class="text-sm text-gray-400 w-10 text-right">
+                          {{ usage.percentage }}%
+                        </span>
                       </div>
-                      <span class="text-sm text-gray-400 w-10 text-right">
-                        {{ usage.percentage }}%
-                      </span>
-                    </div>
-                  </td>
-                  <td class="py-4 px-4 text-gray-400 text-sm">
-                    {{ usage.lastUsed }}
-                  </td>
-                </tr>
+                    </td>
+                    <td class="py-4 px-4 text-gray-400 text-sm">
+                      {{ usage.lastUsed }}
+                    </td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
@@ -210,7 +215,7 @@ interface DailyLimit {
         </div>
       </div>
     </div>
-  `,
+    `,
 })
 export class CreditsComponent {
   dailyLimits: DailyLimit[] = [

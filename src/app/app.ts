@@ -1,13 +1,13 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { NavigationComponent } from "./components/navigation";
-import { CommonModule } from "@angular/common";
+
 import { filter } from "rxjs/operators";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [RouterOutlet, NavigationComponent, CommonModule],
+  imports: [RouterOutlet, NavigationComponent],
   templateUrl: "./app.html",
   styleUrl: "./app.css",
 })

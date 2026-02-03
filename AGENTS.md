@@ -1,6 +1,6 @@
 ## Tech Stack
 
-- **Frontend**: Angular 20 + TypeScript + TailwindCSS 3.4.11
+- **Frontend**: Angular 21 + TypeScript + TailwindCSS 3.4.19
 - **Styling**: TailwindCSS 3 with Typography Plugin + PostCSS + Autoprefixer
 - **Testing**: Angular Testing Framework (Jasmine + Karma via `ng test`)
 - **Build Tool**: Angular CLI with Vite
@@ -177,9 +177,9 @@ module.exports = {
 
 ## Architecture Notes
 
-- Angular 20 with standalone components
+- Angular 21 with standalone components
 - TypeScript throughout the application
-- TailwindCSS 3.4.11 for utility-first styling
+- TailwindCSS 3.4.19 for utility-first styling
 - Typography plugin for rich text content
 - PostCSS with Autoprefixer for cross-browser support
 - Angular Testing Framework (Jasmine + Karma) for unit testing
