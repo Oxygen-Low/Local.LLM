@@ -8,8 +8,7 @@
 
 # Node
 /node_modules
-server/node_modules/
-server/.env
+/.env
 npm-debug.log
 yarn-error.log
 

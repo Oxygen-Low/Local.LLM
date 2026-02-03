@@ -39,13 +39,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm ci
-          cd server && npm install
+        run: npm ci
 
       - name: Start backend
         run: |
-          cd server
           cat <<EOF > .env
           DB_USER=user
           DB_PASSWORD=password
@@ -55,13 +52,13 @@ jobs:
           SESSION_SECRET=super-secret-key
           PORT=3000
           EOF
-          node index.js &
+          node server.js &
 
       - name: Build website
         run: npm run build
 
       - name: Start website
-        run: npm start &
+        run: npx ng serve &
 
       - name: Wait for services
         run: npx wait-on http://localhost:4200 http://localhost:3000/api/status --timeout 60000
