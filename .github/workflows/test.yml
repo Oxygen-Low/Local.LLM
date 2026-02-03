@@ -47,14 +47,14 @@ jobs:
         run: |
           cd server
           cat <<EOF > .env
-DB_USER=user
-DB_PASSWORD=password
-DB_HOST=localhost
-DB_NAME=localllm
-DB_PORT=5432
-SESSION_SECRET=super-secret-key
-PORT=3000
-EOF
+          DB_USER=user
+          DB_PASSWORD=password
+          DB_HOST=localhost
+          DB_NAME=localllm
+          DB_PORT=5432
+          SESSION_SECRET=super-secret-key
+          PORT=3000
+          EOF
           node index.js &
 
       - name: Build website
