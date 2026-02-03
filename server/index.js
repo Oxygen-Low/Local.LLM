@@ -121,9 +121,19 @@ app.post('/api/login', authLimiter, async (req, res) => {
     const user = result.rows[0];
 
     if (user && await bcrypt.compare(password, user.password)) {
-      req.session.userId = user.id;
-      req.session.username = user.username;
-      res.json({ id: user.id, username: user.username });
+      req.session.regenerate((err) => {
+        if (err) {
+          return res.status(500).json({ error: 'Session regeneration failed' });
+        }
+        req.session.userId = user.id;
+        req.session.username = user.username;
+        req.session.save((err) => {
+          if (err) {
+            return res.status(500).json({ error: 'Session save failed' });
+          }
+          res.json({ id: user.id, username: user.username });
+        });
+      });
     } else {
       res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -133,11 +143,10 @@ app.post('/api/login', authLimiter, async (req, res) => {
 });
 
 app.post('/api/logout', (req, res) => {
-  req.session.destroy(err => {
+  req.session.regenerate((err) => {
     if (err) {
       return res.status(500).json({ error: 'Could not log out' });
     }
-    res.clearCookie('connect.sid');
     res.json({ message: 'Logged out' });
   });
 });
