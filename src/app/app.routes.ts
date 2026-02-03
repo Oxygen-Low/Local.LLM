@@ -1,33 +1,44 @@
 import { Routes } from "@angular/router";
+import { authGuard } from "./guards/auth.guard";
 
 export const routes: Routes = [
   {
-    path: "",
+    path: "about",
     loadComponent: () =>
       import("./pages/home/home").then((m) => m.AboutComponent),
   },
   {
+    path: "",
+    redirectTo: "about",
+    pathMatch: "full",
+  },
+  {
     path: "apps",
+    canActivate: [authGuard],
     loadComponent: () =>
       import("./pages/apps/apps").then((m) => m.AppsListComponent),
   },
   {
     path: "settings",
+    canActivate: [authGuard],
     loadComponent: () =>
       import("./pages/settings/settings").then((m) => m.SettingsComponent),
   },
   {
     path: "friends",
+    canActivate: [authGuard],
     loadComponent: () =>
       import("./pages/friends/friends").then((m) => m.FriendsListComponent),
   },
   {
     path: "credits",
+    canActivate: [authGuard],
     loadComponent: () =>
       import("./pages/credits/credits").then((m) => m.CreditsComponent),
   },
   {
     path: "social",
+    canActivate: [authGuard],
     loadComponent: () =>
       import("./pages/social/social").then((m) => m.SocialMediaSimComponent),
   },

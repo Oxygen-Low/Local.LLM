@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: "app-auth",
@@ -118,17 +119,32 @@ export class AuthComponent {
   message = "";
   isSignup = false;
 
+  constructor(private authService: AuthService) {}
+
   onSubmit() {
     if (!this.username || !this.password) {
       this.message = "Please fill in all fields";
       return;
     }
 
-    // Placeholder authentication logic
     if (this.isSignup) {
-      this.message = `Signup attempt: ${this.username}`;
+      this.authService.register(this.username, this.password).subscribe({
+        next: () => {
+          this.message = "Registration successful!";
+        },
+        error: (err) => {
+          this.message = err.error?.error || "Registration failed";
+        },
+      });
     } else {
-      this.message = `Login attempt: ${this.username}`;
+      this.authService.login(this.username, this.password).subscribe({
+        next: () => {
+          this.message = "Login successful!";
+        },
+        error: (err) => {
+          this.message = err.error?.error || "Login failed";
+        },
+      });
     }
   }
 
