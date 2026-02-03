@@ -31,6 +31,28 @@ app.use(cors({
   credentials: true
 }));
 
+// CSRF protection using doubleCsrf
+const {
+  invalidCsrfTokenError,
+  generateToken,
+  doubleCsrfProtection
+} = doubleCsrf({
+  getSecret: () => process.env.CSRF_SECRET || 'change-this-secret',
+  cookieName: 'x-csrf-token',
+  cookieOptions: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production'
+  },
+  getTokenFromRequest: (req) => req.headers['x-csrf-token']
+});
+
+// Endpoint to obtain CSRF token
+app.get('/api/csrf-token', (req, res) => {
+  const csrfToken = generateToken(res, req);
+  res.json({ csrfToken });
+});
+
 // Rate limiting configuration
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -106,7 +128,7 @@ async function initDb() {
 }
 
 // Routes
-app.post('/api/register', authLimiter, async (req, res) => {
+app.post('/api/register', authLimiter, doubleCsrfProtection, async (req, res) => {
   const { username, password } = req.body;
 
   // Validation
@@ -146,7 +168,7 @@ app.post('/api/register', authLimiter, async (req, res) => {
   }
 });
 
-app.post('/api/login', authLimiter, async (req, res) => {
+app.post('/api/login', authLimiter, doubleCsrfProtection, async (req, res) => {
   const { username, password } = req.body;
   try {
     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
@@ -174,7 +196,7 @@ app.post('/api/login', authLimiter, async (req, res) => {
   }
 });
 
-app.post('/api/logout', (req, res) => {
+app.post('/api/logout', doubleCsrfProtection, (req, res) => {
   req.session.regenerate((err) => {
     if (err) {
       return res.status(500).json({ error: 'Could not log out' });
@@ -189,6 +211,14 @@ app.get('/api/status', (req, res) => {
   } else {
     res.json({ authenticated: false });
   }
+});
+
+// CSRF error handler
+app.use((err, req, res, next) => {
+  if (err === invalidCsrfTokenError) {
+    return res.status(403).json({ error: 'Invalid CSRF token' });
+  }
+  return next(err);
 });
 
 async function startServer() {
