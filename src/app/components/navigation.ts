@@ -1,6 +1,7 @@
 import { Component, signal, OnInit, HostListener } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink, RouterLinkActive } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-navigation",
@@ -59,7 +60,9 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
       <!-- User Menu -->
       <div class="px-4 py-6">
         <button
+          (click)="logout()"
           class="w-full flex items-center justify-center p-3 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-700 transition-colors duration-200"
+          title="Logout"
         >
           <svg
             class="h-6 w-6"
@@ -72,7 +75,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
             />
           </svg>
         </button>
@@ -137,8 +140,14 @@ export class NavigationComponent implements OnInit {
   sidebarOpen = signal(false);
   isMobile = signal(false);
 
+  constructor(private authService: AuthService) {}
+
   ngOnInit() {
     this.updateIsMobile();
+  }
+
+  logout() {
+    this.authService.logout();
   }
 
   @HostListener("window:resize", ["$event"])
