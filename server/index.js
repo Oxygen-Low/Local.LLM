@@ -7,6 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const csrf = require('lusca').csrf;
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -60,7 +61,23 @@ app.use(session({
   }
 }));
 
-// Initialize database
+// CSRF protection middleware
+app.use(csrf());
+
+app.get('/api/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
+/**
+ * Ensure the required `users` table exists in the PostgreSQL database.
+ *
+ * Creates a table named `users` with columns:
+ * - `id` (serial primary key)
+ * - `username` (text, unique, not null)
+ * - `password` (text, not null)
+ * - `bio` (text, nullable)
+ * - `is_public` (boolean, defaults to false)
+ */
 async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
