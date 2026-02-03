@@ -64,7 +64,16 @@ app.use(session({
 // CSRF protection middleware
 app.use(csrf());
 
-// Initialize database
+/**
+ * Ensure the required `users` table exists in the PostgreSQL database.
+ *
+ * Creates a table named `users` with columns:
+ * - `id` (serial primary key)
+ * - `username` (text, unique, not null)
+ * - `password` (text, not null)
+ * - `bio` (text, nullable)
+ * - `is_public` (boolean, defaults to false)
+ */
 async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
