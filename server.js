@@ -7,7 +7,8 @@ const PgSession = require('connect-pg-simple')(session);
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const csrf = require('lusca').csrf;
+const helmet = require('helmet');
+const { doubleCsrf } = require('csrf-csrf');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ const pool = new Pool({
 });
 
 // Middleware
+app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
@@ -61,11 +63,24 @@ app.use(session({
   }
 }));
 
+// CSRF protection configuration
+const { generateToken, doubleCsrfProtection } = doubleCsrf({
+  getSecret: () => process.env.SESSION_SECRET,
+  cookieName: "x-csrf-token",
+  cookieOptions: {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+  },
+  getTokenFromRequest: (req) => req.headers["x-csrf-token"],
+});
+
 // CSRF protection middleware
-app.use(csrf());
+app.use(doubleCsrfProtection);
 
 app.get('/api/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
+  res.json({ csrfToken: generateToken(req, res) });
 });
 
 /**
