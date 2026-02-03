@@ -40,8 +40,24 @@ export class AuthService {
     );
   }
 
+  private getCsrfToken(): Observable<string> {
+    return this.http
+      .get<{ csrfToken: string }>(`${this.apiUrl}/csrf-token`, { withCredentials: true })
+      .pipe(map(res => res.csrfToken));
+  }
+
   login(username: string, password: string): Observable<any> {
-    return this.http.post<User>(`${this.apiUrl}/login`, { username, password }, { withCredentials: true }).pipe(
+    return this.getCsrfToken().pipe(
+      switchMap(token =>
+        this.http.post<User>(
+          `${this.apiUrl}/login`,
+          { username, password },
+          {
+            headers: { 'x-csrf-token': token },
+            withCredentials: true
+          }
+        )
+      ),
       tap(user => {
         this.currentUserSignal.set(user);
         this.router.navigate(['/apps']);
@@ -50,22 +66,44 @@ export class AuthService {
   }
 
   register(username: string, password: string): Observable<any> {
-    return this.http.post<User>(`${this.apiUrl}/register`, { username, password }, { withCredentials: true }).pipe(
+    return this.getCsrfToken().pipe(
+      switchMap(token =>
+        this.http.post<User>(
+          `${this.apiUrl}/register`,
+          { username, password },
+          {
+            headers: { 'x-csrf-token': token },
+            withCredentials: true
+          }
+        )
+      ),
       switchMap(() => this.login(username, password))
     );
   }
 
   logout(): void {
-    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).pipe(
-      tap(() => {
-        this.currentUserSignal.set(null);
-        this.router.navigate(['/about']);
-      }),
-      catchError(() => {
-        this.currentUserSignal.set(null);
-        this.router.navigate(['/about']);
-        return of(null);
-      })
-    ).subscribe();
+    this.getCsrfToken()
+      .pipe(
+        switchMap(token =>
+          this.http.post(
+            `${this.apiUrl}/logout`,
+            {},
+            {
+              headers: { 'x-csrf-token': token },
+              withCredentials: true
+            }
+          )
+        ),
+        tap(() => {
+          this.currentUserSignal.set(null);
+          this.router.navigate(['/about']);
+        }),
+        catchError(() => {
+          this.currentUserSignal.set(null);
+          this.router.navigate(['/about']);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 }
