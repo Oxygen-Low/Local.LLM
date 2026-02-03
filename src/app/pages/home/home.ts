@@ -1,16 +1,16 @@
 import { Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
+
 import { RouterLink } from "@angular/router";
 
 @Component({
   selector: "app-about",
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   template: `
     <!-- Hero Section -->
     <section
       class="relative min-h-screen flex items-center justify-center overflow-hidden"
-    >
+      >
       <!-- Gradient Background -->
       <div class="absolute inset-0" style="background-color: #282828;"></div>
       <div
@@ -22,7 +22,7 @@ import { RouterLink } from "@angular/router";
 
       <div
         class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
-      >
+        >
         <div class="animate-fade-in">
           <!-- Main Heading -->
           <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
@@ -32,7 +32,7 @@ import { RouterLink } from "@angular/router";
           <!-- Subheading -->
           <p
             class="text-xl sm:text-2xl text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto"
-          >
+            >
             An open-source community project.
           </p>
 
@@ -53,15 +53,16 @@ import { RouterLink } from "@angular/router";
         <h2 class="section-title text-center">Why local.llm?</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div
-            *ngFor="let feature of features"
-            class="card p-8 card-hover group"
-          >
-            <h3 class="text-xl font-bold text-gray-100 mb-3">
-              {{ feature.title }}
-            </h3>
-            <p class="text-gray-400">{{ feature.description }}</p>
-          </div>
+          @for (feature of features; track feature) {
+            <div
+              class="card p-8 card-hover group"
+              >
+              <h3 class="text-xl font-bold text-gray-100 mb-3">
+                {{ feature.title }}
+              </h3>
+              <p class="text-gray-400">{{ feature.description }}</p>
+            </div>
+          }
         </div>
       </div>
     </section>
@@ -69,7 +70,7 @@ import { RouterLink } from "@angular/router";
     <!-- Footer CTA -->
     <section
       class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-gray-900 to-gray-800"
-    >
+      >
       <div class="max-w-4xl mx-auto text-center">
         <h2 class="text-4xl font-bold text-gray-100 mb-6">
           Ready to get started?
@@ -78,7 +79,7 @@ import { RouterLink } from "@angular/router";
         <p>Self-Hosted: Go to our GitHub.</p>
       </div>
     </section>
-  `,
+    `,
 })
 export class AboutComponent {
   features = [

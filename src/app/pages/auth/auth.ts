@@ -1,17 +1,17 @@
 import { Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
+
 import { FormsModule } from "@angular/forms";
 import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: "app-auth",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div
       class="min-h-screen flex items-center justify-center px-4"
       style="background-color: #282828;"
-    >
+      >
       <!-- Animated Background Elements -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
         <div
@@ -32,7 +32,7 @@ import { AuthService } from "../../services/auth.service";
             </h1>
             <p class="text-gray-400">
               {{
-                isSignup ? "Create a new account" : "Sign in to your account"
+              isSignup ? "Create a new account" : "Sign in to your account"
               }}
             </p>
           </div>
@@ -44,7 +44,7 @@ import { AuthService } from "../../services/auth.service";
               <label
                 for="username"
                 class="block text-sm font-medium text-gray-300 mb-2"
-              >
+                >
                 Username
               </label>
               <input
@@ -55,7 +55,7 @@ import { AuthService } from "../../services/auth.service";
                 class="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
                 placeholder="Enter your username"
                 required
-              />
+                />
             </div>
 
             <!-- Password Field -->
@@ -63,7 +63,7 @@ import { AuthService } from "../../services/auth.service";
               <label
                 for="password"
                 class="block text-sm font-medium text-gray-300 mb-2"
-              >
+                >
                 Password
               </label>
               <input
@@ -74,14 +74,14 @@ import { AuthService } from "../../services/auth.service";
                 class="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
                 placeholder="Enter your password"
                 required
-              />
+                />
             </div>
 
             <!-- Submit Button -->
             <button
               type="submit"
               class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
-            >
+              >
               {{ isSignup ? "Create Account" : "Sign In" }}
             </button>
           </form>
@@ -90,28 +90,29 @@ import { AuthService } from "../../services/auth.service";
           <div class="mt-6 text-center">
             <p class="text-gray-400 text-sm">
               {{
-                isSignup ? "Already have an account?" : "Don't have an account?"
+              isSignup ? "Already have an account?" : "Don't have an account?"
               }}
               <button
                 (click)="toggleMode()"
                 class="text-primary hover:text-primary/80 font-semibold transition"
-              >
+                >
                 {{ isSignup ? "Sign In" : "Sign Up" }}
               </button>
             </p>
           </div>
 
           <!-- Message -->
-          <div
-            *ngIf="message"
-            class="mt-6 p-4 bg-gray-700/50 rounded-lg border border-gray-600"
-          >
-            <p class="text-gray-300 text-sm text-center">{{ message }}</p>
-          </div>
+          @if (message) {
+            <div
+              class="mt-6 p-4 bg-gray-700/50 rounded-lg border border-gray-600"
+              >
+              <p class="text-gray-300 text-sm text-center">{{ message }}</p>
+            </div>
+          }
         </div>
       </div>
     </div>
-  `,
+    `,
 })
 export class AuthComponent {
   username = "";
