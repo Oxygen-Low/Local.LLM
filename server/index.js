@@ -64,6 +64,10 @@ app.use(session({
 // CSRF protection middleware
 app.use(csrf());
 
+app.get('/api/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
 /**
  * Ensure the required `users` table exists in the PostgreSQL database.
  *
