@@ -7,6 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const csrf = require('lusca').csrf;
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -59,6 +60,9 @@ app.use(session({
     sameSite: 'lax'
   }
 }));
+
+// CSRF protection middleware
+app.use(csrf());
 
 // Initialize database
 async function initDb() {
