@@ -31,12 +31,6 @@ export const routes: Routes = [
       import("./pages/friends/friends").then((m) => m.FriendsListComponent),
   },
   {
-    path: "credits",
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import("./pages/credits/credits").then((m) => m.CreditsComponent),
-  },
-  {
     path: "social",
     canActivate: [authGuard],
     loadComponent: () =>

@@ -40,13 +40,6 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
             Friends
           </a>
           <a
-            routerLink="/credits"
-            routerLinkActive="text-white bg-gray-900"
-            class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
-            >
-            Credits
-          </a>
-          <a
             routerLink="/settings"
             routerLinkActive="text-white bg-gray-900"
             class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
