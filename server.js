@@ -196,6 +196,12 @@ app.get('/api/status', (req, res) => {
   }
 });
 
+/**
+ * Initialize the database and start the Express HTTP server on the configured port.
+ *
+ * Attempts to run database initialization and then listen on PORT; on failure logs an error
+ * (for connection-refused errors it logs PostgreSQL-specific guidance) and exits the process with code 1.
+ */
 async function startServer() {
   try {
     await initDb();
@@ -203,7 +209,13 @@ async function startServer() {
       console.log(`Server running at http://localhost:${PORT}`);
     });
   } catch (err) {
-    console.error('Error starting server:', err);
+    if (err.code === 'ECONNREFUSED') {
+      console.error('CRITICAL: Could not connect to the PostgreSQL database.');
+      console.error('Ensure that your PostgreSQL server is running and accessible.');
+      console.error('If you have Docker installed, you can start the database using: npm run db:up');
+    } else {
+      console.error('Error starting server:', err);
+    }
     process.exit(1);
   }
 }
