@@ -101,12 +101,6 @@ export class AboutComponent {
         "We almost never view your information, unless we detect you trying to bypass safety.",
     },
     {
-      icon: "💰",
-      title: "Credit System",
-      description:
-        "Free LLM credits with a daily and weekly limit for those who are unable to run LLM models on their device.",
-    },
-    {
       icon: "👥",
       title: "Share & Collaborate",
       description:
