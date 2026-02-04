@@ -7,7 +7,6 @@ interface App {
   name: string;
   description: string;
   icon: string;
-  creditsUsed: number;
   lastUsed: string;
   status: "active" | "inactive" | "new";
   category: string;
@@ -76,19 +75,11 @@ interface App {
                 }}</span>
               </div>
               <!-- Stats -->
-              <div class="grid grid-cols-2 gap-4 mb-6 py-4">
-                <div>
-                  <p class="text-xs text-gray-500 mb-1">Credits Used</p>
-                  <p class="text-sm font-semibold text-gray-100">
-                    {{ app.creditsUsed }}
-                  </p>
-                </div>
-                <div>
-                  <p class="text-xs text-gray-500 mb-1">Last Used</p>
-                  <p class="text-sm font-semibold text-gray-100">
-                    {{ app.lastUsed }}
-                  </p>
-                </div>
+              <div class="mb-6 py-4">
+                <p class="text-xs text-gray-500 mb-1">Last Used</p>
+                <p class="text-sm font-semibold text-gray-100">
+                  {{ app.lastUsed }}
+                </p>
               </div>
               <!-- Actions -->
               <div class="flex gap-3">
