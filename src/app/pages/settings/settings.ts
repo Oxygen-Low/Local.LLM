@@ -536,7 +536,7 @@ export class SettingsComponent {
     {
       id: "built-in",
       name: "Built-In Models",
-      description: "Use your available credits for built-in models",
+      description: "Configure built-in model providers",
     },
   ];
 
