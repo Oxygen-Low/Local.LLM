@@ -23,6 +23,11 @@ const DB_NAME = process.env.DB_NAME;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_PORT = process.env.DB_PORT;
 
+if (!DB_USER || !DB_HOST || !DB_NAME || !DB_PASSWORD || !DB_PORT) {
+  console.error('CRITICAL: Database environment variables (DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT) must all be defined.');
+  process.exit(1);
+}
+
 if (!SESSION_SECRET || SESSION_SECRET.length < 32 || SESSION_SECRET === 'super-secret-key') {
   console.error('CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and not be a default value.');
   process.exit(1);
