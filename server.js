@@ -196,6 +196,12 @@ app.get('/api/status', (req, res) => {
   }
 });
 
+/**
+ * Initialize the database and start the Express HTTP server on the configured port.
+ *
+ * Attempts to run database initialization and then listen on PORT; on failure logs an error
+ * (for connection-refused errors it logs PostgreSQL-specific guidance) and exits the process with code 1.
+ */
 async function startServer() {
   try {
     await initDb();
