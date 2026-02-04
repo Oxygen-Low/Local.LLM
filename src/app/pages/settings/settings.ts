@@ -1,7 +1,6 @@
 import { Component, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { RouterLink } from "@angular/router";
 import { AuthService } from "../../services/auth.service";
 
 type SettingsTab = "llm" | "account";
@@ -15,7 +14,7 @@ interface LLMProvider {
 @Component({
   selector: "app-settings",
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   template: `
     <div
       class="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
