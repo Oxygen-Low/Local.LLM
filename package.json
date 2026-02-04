@@ -49,7 +49,8 @@
   "overrides": {
     "sucrase": {
       "glob": "^10.5.0"
-    }
+    },
+    "@modelcontextprotocol/sdk": "1.26.0"
   },
   "devDependencies": {
     "@angular/build": "21.1.2",
