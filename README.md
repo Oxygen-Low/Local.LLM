@@ -53,11 +53,5 @@ Before you begin, ensure you have the following installed:
 - **Build for production**: `npm run build`
 - **Start backend only**: `npm run server`
 
-## Security
-
-- **Authentication**: Session-based authentication with session regeneration on login/logout.
-- **Validation**: User registration requires a username (3-20 characters, alphanumeric/underscore) and a strong password (at least 8 characters, including one letter and one number).
-- **Protection**: CSRF protection using Double Cookie Anti-CSRF and secure HTTP headers via Helmet.
-
 ## License
 Distributed under the MIT License. See `LICENSE` for more information.
