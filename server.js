@@ -10,8 +10,18 @@ const cors = require('cors');
 const helmet = require('helmet');
 const lusca = require('lusca');
 
+// Validate environment variables
+const SESSION_SECRET = process.env.SESSION_SECRET;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const IS_PRODUCTION = NODE_ENV === 'production';
+const PORT = process.env.PORT || 3000;
+
+if (!SESSION_SECRET || SESSION_SECRET.length < 32 || SESSION_SECRET === 'super-secret-key') {
+  console.error('CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and not be a default value.');
+  process.exit(1);
+}
+
 const app = express();
-const port = process.env.PORT || 3000;
 
 // Database connection
 const pool = new Pool({
@@ -38,12 +48,6 @@ const authLimiter = rateLimit({
   message: { error: 'Too many attempts, please try again later' }
 });
 
-// Validate session secret
-if (!process.env.SESSION_SECRET) {
-  console.error('CRITICAL: SESSION_SECRET is not defined in environment variables');
-  process.exit(1);
-}
-
 // Session configuration
 app.use(session({
   store: new PgSession({
@@ -51,19 +55,33 @@ app.use(session({
     tableName: 'session',
     createTableIfMissing: true
   }),
-  secret: process.env.SESSION_SECRET,
+  secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   rolling: true, // Refresh cookie on every request
   cookie: {
     maxAge: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: IS_PRODUCTION,
     sameSite: 'lax'
   }
 }));
 
-app.use(lusca.csrf());
+// CSRF protection configuration
+const { generateToken, doubleCsrfProtection } = doubleCsrf({
+  getSecret: () => SESSION_SECRET,
+  cookieName: "x-csrf-token",
+  cookieOptions: {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    secure: IS_PRODUCTION,
+  },
+  getTokenFromRequest: (req) => req.headers["x-csrf-token"],
+});
+
+// CSRF protection middleware
+app.use(doubleCsrfProtection);
 
 app.get('/api/csrf-token', (req, res) => {
   res.json({ csrfToken: res.locals._csrf });
@@ -180,8 +198,8 @@ app.get('/api/status', (req, res) => {
 async function startServer() {
   try {
     await initDb();
-    app.listen(port, () => {
-      console.log(`Server running at http://localhost:${port}`);
+    app.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
     });
   } catch (err) {
     console.error('Error starting server:', err);
