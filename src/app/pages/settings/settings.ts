@@ -254,14 +254,7 @@ interface LLMProvider {
                     <div>
                       <h3 class="font-bold text-gray-100">Built-in Models</h3>
                       <p class="text-gray-400 text-sm mt-1">
-                        Access your available credits in the
-                        <a
-                          routerLink="/credits"
-                          class="text-primary hover:text-secondary"
-                          >
-                          Credits page
-                        </a>
-                        to view built-in model options.
+                        Configure options for built-in model providers.
                       </p>
                     </div>
                   </div>
