@@ -39,6 +39,16 @@ Before you begin, ensure you have the following installed:
 4. **Prepare the database**:
    The application will automatically create the necessary tables (`users`, `session`) upon startup if they do not exist. Ensure your PostgreSQL server is running and the database specified in `.env` exists.
 
+   **Docker (Recommended)**:
+   If you have Docker installed, you can easily start a PostgreSQL database with the following command:
+   ```bash
+   npm run db:up
+   ```
+   To stop the database:
+   ```bash
+   npm run db:down
+   ```
+
 5. **Start the application**:
    ```bash
    npm start

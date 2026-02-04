@@ -203,7 +203,13 @@ async function startServer() {
       console.log(`Server running at http://localhost:${PORT}`);
     });
   } catch (err) {
-    console.error('Error starting server:', err);
+    if (err.code === 'ECONNREFUSED') {
+      console.error('CRITICAL: Could not connect to the PostgreSQL database.');
+      console.error('Ensure that your PostgreSQL server is running and accessible.');
+      console.error('If you have Docker installed, you can start the database using: npm run db:up');
+    } else {
+      console.error('Error starting server:', err);
+    }
     process.exit(1);
   }
 }
