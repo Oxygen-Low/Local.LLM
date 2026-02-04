@@ -225,7 +225,7 @@ export class SocialMediaSimComponent {
       author: "AIEnthusiast",
       avatar: "🧠",
       content:
-        "The credit system on local.llm is so transparent. Unlike other platforms, I know exactly where my credits are going. Love the detailed breakdown!",
+        "local.llm is so transparent about how it works. Unlike other platforms, I understand exactly what's going on. Love the detailed documentation!",
       timestamp: "6 hours ago",
       likes: 201,
       comments: 34,
