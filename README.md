@@ -1,31 +1,57 @@
 # Local.LLM
 
-Local.LLM is a community-focused LLM platform, featuring many apps and quick updates.
+Local.LLM is a community focused ai platform that provides tools for almost anyone.
 
-### Self Hosting
+You can skip the setup by installing [Oxygen Low's Software App](https://github.com/Oxygen-Low/Oxygen-Lows-Software-App)
 
-## Requirements
+# Setup
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
 
 1. [Git](https://git-scm.com/install/)
-2. [Node.js](https://nodejs.org/en/download/)
-   
+2. [Node.js](https://nodejs.org/en/download/) (v18 or later recommended)
+3. [PostgreSQL](https://www.postgresql.org/download/) (v14 or later recommended)
+
 ## Setup
 
-There are 2 different types of self-hosted servers:
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Oxygen-Low/Local.LLM
+   cd Local.LLM
+   ```
 
-Local - No credits system, certain apps accessible.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-Non-Local - Credits system, certain apps inaccessible (this is the type our hosted server uses).
+3. **Configure environment variables**:
+   Create a `.env` file in the root directory and populate it with your configuration. You can use `.env.example` as a template:
+   ```bash
+   cp .env.example .env
+   ```
+   **Important**:
+   - Ensure you set a secure `SESSION_SECRET` that is at least 32 characters long and not a default value.
+   - Provide your PostgreSQL connection details (`DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`, `DB_PORT`).
 
-You can switch between them in the .env file by setting local to true.
+4. **Prepare the database**:
+   The application will automatically create the necessary tables (`users`, `session`) upon startup if they do not exist. Ensure your PostgreSQL server is running and the database specified in `.env` exists.
 
-Either do the automatic installation (via the Oxygen Low's Software app), or follow the instructions below:
+5. **Start the application**:
+   ```bash
+   npm start
+   ```
+   This will concurrently start the Angular development server and the Express backend.
+   - Frontend: [http://localhost:4200](http://localhost:4200)
+   - Backend: [http://localhost:3000](http://localhost:3000)
 
-1. Clone the repository (`git clone https://github.com/Oxygen-Low/Local.LLM`)
-2. Run `npm install`
-3. Run `npm start`
+## Development
 
-## Extra Information
-Local.LLM is made and developed by Oxygen Low's Software, and is also available in the Oxygen Low's Software app for installation and usage under the utilities category.
+- **Run unit tests**: `npm test`
+- **Build for production**: `npm run build`
+- **Start backend only**: `npm run server`
 
-It is a project solely focused on providing tools that are usually paid for, for free, either locally hosted or using our servers.
+## License
+Distributed under the MIT License. See `LICENSE` for more information.
