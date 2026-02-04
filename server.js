@@ -16,6 +16,13 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const IS_PRODUCTION = NODE_ENV === 'production';
 const PORT = process.env.PORT || 3000;
 
+// Extract and validate database environment variables
+const DB_USER = process.env.DB_USER;
+const DB_HOST = process.env.DB_HOST;
+const DB_NAME = process.env.DB_NAME;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_PORT = process.env.DB_PORT;
+
 if (!SESSION_SECRET || SESSION_SECRET.length < 32 || SESSION_SECRET === 'super-secret-key') {
   console.error('CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and not be a default value.');
   process.exit(1);
@@ -25,11 +32,11 @@ const app = express();
 
 // Database connection
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  user: DB_USER,
+  host: DB_HOST,
+  database: DB_NAME,
+  password: DB_PASSWORD,
+  port: DB_PORT,
 });
 
 // Middleware
@@ -90,13 +97,6 @@ app.get('/api/csrf-token', (req, res) => {
 
 /**
  * Ensure the required `users` table exists in the PostgreSQL database.
- *
- * Creates a table named `users` with columns:
- * - `id` (serial primary key)
- * - `username` (text, unique, not null)
- * - `password` (text, not null)
- * - `bio` (text, nullable)
- * - `is_public` (boolean, defaults to false)
  */
 async function initDb() {
   await pool.query(`
@@ -196,27 +196,38 @@ app.get('/api/status', (req, res) => {
   }
 });
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
  * Initialize the database and start the Express HTTP server on the configured port.
- *
- * Attempts to run database initialization and then listen on PORT; on failure logs an error
- * (for connection-refused errors it logs PostgreSQL-specific guidance) and exits the process with code 1.
+ * Retries connection if the database is not ready.
  */
 async function startServer() {
-  try {
-    await initDb();
-    app.listen(PORT, () => {
-      console.log(`Server running at http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    if (err.code === 'ECONNREFUSED') {
-      console.error('CRITICAL: Could not connect to the PostgreSQL database.');
-      console.error('Ensure that your PostgreSQL server is running and accessible.');
-      console.error('If you have Docker installed, you can start the database using: npm run db:up');
-    } else {
-      console.error('Error starting server:', err);
+  const maxRetries = 10;
+  const retryInterval = 2000; // 2 seconds
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await initDb();
+      app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+      });
+      return;
+    } catch (err) {
+      if (err.code === 'ECONNREFUSED' && i < maxRetries - 1) {
+        console.log(`Database connection failed. Retrying in ${retryInterval / 1000}s... (${i + 1}/${maxRetries})`);
+        await sleep(retryInterval);
+      } else {
+        if (err.code === 'ECONNREFUSED') {
+          console.error('CRITICAL: Could not connect to the PostgreSQL database.');
+          console.error('Ensure that your PostgreSQL server is running and accessible.');
+          console.error('If you have Docker installed, you can start the database using: npm run db:up');
+        } else {
+          console.error('Error starting server:', err);
+        }
+        process.exit(1);
+      }
     }
-    process.exit(1);
   }
 }
 
