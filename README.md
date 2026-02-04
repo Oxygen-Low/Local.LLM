@@ -1,13 +1,10 @@
 # Local.LLM
 
-Local.LLM is a community-focused platform for running and interacting with Large Language Models (LLMs) locally, featuring a modern web interface and a robust Node.js backend.
+Local.LLM is a community focused ai platform that provides tools for almost anyone.
 
-## Tech Stack
+You can skip the setup by installing [Oxygen Low's Software App](https://github.com/Oxygen-Low/Oxygen-Lows-Software-App)
 
-- **Frontend**: Angular 21, TypeScript, Tailwind CSS
-- **Backend**: Node.js, Express, PostgreSQL
-- **Database**: PostgreSQL (User management, session storage)
-- **Security**: Helmet, CSRF protection (double-csrf), Session-based authentication
+# Setup
 
 ## Prerequisites
 
