@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
-const { doubleCsrf } = require('csrf-csrf');
+const lusca = require('lusca');
 
 // Validate environment variables
 const SESSION_SECRET = process.env.SESSION_SECRET;
@@ -84,7 +84,7 @@ const { generateToken, doubleCsrfProtection } = doubleCsrf({
 app.use(doubleCsrfProtection);
 
 app.get('/api/csrf-token', (req, res) => {
-  res.json({ csrfToken: generateToken(req, res) });
+  res.json({ csrfToken: res.locals._csrf });
 });
 
 /**
