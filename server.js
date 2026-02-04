@@ -21,6 +21,27 @@ if (!SESSION_SECRET || SESSION_SECRET.length < 32 || SESSION_SECRET === 'super-s
   process.exit(1);
 }
 
+// CSRF protection configuration using doubleCsrf
+const {
+  doubleCsrfProtection,
+  generateToken: generateCsrfToken
+} = doubleCsrf({
+  getSecret: () => SESSION_SECRET,
+  cookieName: 'x-csrf-token',
+  cookieOptions: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: IS_PRODUCTION
+  },
+  getTokenFromRequest: (req) => {
+    const headerToken = req.headers['x-csrf-token'] || req.headers['x-xsrf-token'];
+    if (Array.isArray(headerToken)) {
+      return headerToken[0];
+    }
+    return headerToken;
+  }
+});
+
 const app = express();
 
 // Database connection
@@ -40,6 +61,12 @@ app.use(cors({
   origin: 'http://localhost:4200', // Default Angular port
   credentials: true
 }));
+
+// Endpoint to obtain CSRF token for the frontend
+app.get('/api/csrf-token', (req, res) => {
+  const csrfToken = generateCsrfToken(req, res);
+  res.json({ csrfToken });
+});
 
 // Rate limiting configuration
 const authLimiter = rateLimit({
@@ -111,7 +138,7 @@ async function initDb() {
 }
 
 // Routes
-app.post('/api/register', authLimiter, async (req, res) => {
+app.post('/api/register', authLimiter, doubleCsrfProtection, async (req, res) => {
   const { username, password } = req.body;
 
   // Validation
@@ -151,7 +178,7 @@ app.post('/api/register', authLimiter, async (req, res) => {
   }
 });
 
-app.post('/api/login', authLimiter, async (req, res) => {
+app.post('/api/login', authLimiter, doubleCsrfProtection, async (req, res) => {
   const { username, password } = req.body;
   try {
     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
@@ -179,7 +206,7 @@ app.post('/api/login', authLimiter, async (req, res) => {
   }
 });
 
-app.post('/api/logout', (req, res) => {
+app.post('/api/logout', doubleCsrfProtection, (req, res) => {
   req.session.regenerate((err) => {
     if (err) {
       return res.status(500).json({ error: 'Could not log out' });
