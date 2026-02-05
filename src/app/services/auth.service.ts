@@ -19,6 +19,7 @@ export class AuthService {
 
   currentUser = computed(() => this.currentUserSignal());
   isAuthenticated = computed(() => !!this.currentUserSignal());
+  isAdmin = computed(() => this.currentUserSignal()?.isAdmin || false);
 
   constructor(private http: HttpClient, private router: Router) {
     this.checkStatus().subscribe();
