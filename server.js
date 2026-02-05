@@ -15,6 +15,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const IS_PRODUCTION = NODE_ENV === 'production';
 const PORT = process.env.PORT || 3000;
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 
 // Extract and validate database environment variables
 const DB_USER = process.env.DB_USER;
