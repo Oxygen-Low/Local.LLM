@@ -467,7 +467,8 @@ function triggerRestart() {
 
   let child;
   if (isWindows) {
-    child = spawn("cmd.exe", ["/c", scriptPath], {
+    // On Windows, execute the restart script directly to avoid shell interpretation of the path.
+    child = spawn(scriptPath, [], {
       detached: true,
       stdio: "ignore",
       cwd: __dirname,
