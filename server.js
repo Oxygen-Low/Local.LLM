@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
-const { doubleCsrf } = require('csrf-csrf');
+const lusca = require('lusca');
 
 // Validate environment variables
 const SESSION_SECRET = process.env.SESSION_SECRET;
@@ -81,25 +81,20 @@ app.use(session({
   }
 }));
 
-// CSRF protection configuration
-const { generateToken, doubleCsrfProtection } = doubleCsrf({
-  getSecret: () => SESSION_SECRET,
-  cookieName: "x-csrf-token",
-  cookieOptions: {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    secure: IS_PRODUCTION,
-  },
-  getTokenFromRequest: (req) => req.headers["x-csrf-token"],
-});
-
 // CSRF protection middleware
-app.use(doubleCsrfProtection);
+app.use(lusca.csrf());
 
 app.get('/api/csrf-token', (req, res) => {
-  const csrfToken = generateToken(req, res);
-  res.json({ csrfToken });
+  res.json({ csrfToken: res.locals._csrf });
+});
+
+// Error handler for CSRF and other errors
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN' || err.message === 'invalid csrf token' || err.status === 403) {
+    return res.status(403).json({ error: 'Invalid CSRF token' });
+  }
+  console.error(err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 /**
