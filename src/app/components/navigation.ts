@@ -1,6 +1,6 @@
 import { Component, signal, OnInit, HostListener } from "@angular/core";
-
 import { RouterLink, RouterLinkActive } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-navigation",
@@ -46,6 +46,15 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
           >
             Settings
           </a>
+          @if (authService.isAdmin()) {
+            <a
+              routerLink="/admin"
+              routerLinkActive="text-white bg-gray-900"
+              class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
+            >
+              Admin
+            </a>
+          }
         </div>
       </div>
 
@@ -130,6 +139,8 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
 export class NavigationComponent implements OnInit {
   sidebarOpen = signal(false);
   isMobile = signal(false);
+
+  constructor(public authService: AuthService) {}
 
   ngOnInit() {
     this.updateIsMobile();

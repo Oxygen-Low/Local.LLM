@@ -1,20 +1,21 @@
-require('dotenv').config();
-const express = require('express');
-const { Pool } = require('pg');
-const bcrypt = require('bcryptjs');
-const session = require('express-session');
-const PgSession = require('connect-pg-simple')(session);
-const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
-const helmet = require('helmet');
-const lusca = require('lusca');
+require("dotenv").config();
+const express = require("express");
+const { Pool } = require("pg");
+const bcrypt = require("bcryptjs");
+const session = require("express-session");
+const PgSession = require("connect-pg-simple")(session);
+const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const helmet = require("helmet");
+const lusca = require("lusca");
 
 // Validate environment variables
 const SESSION_SECRET = process.env.SESSION_SECRET;
-const NODE_ENV = process.env.NODE_ENV || 'development';
-const IS_PRODUCTION = NODE_ENV === 'production';
+const NODE_ENV = process.env.NODE_ENV || "development";
+const IS_PRODUCTION = NODE_ENV === "production";
 const PORT = process.env.PORT || 3000;
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 
 // Extract and validate database environment variables
 const DB_USER = process.env.DB_USER;
@@ -24,12 +25,20 @@ const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_PORT = process.env.DB_PORT;
 
 if (!DB_USER || !DB_HOST || !DB_NAME || !DB_PASSWORD || !DB_PORT) {
-  console.error('CRITICAL: Database environment variables (DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT) must all be defined.');
+  console.error(
+    "CRITICAL: Database environment variables (DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT) must all be defined.",
+  );
   process.exit(1);
 }
 
-if (!SESSION_SECRET || SESSION_SECRET.length < 32 || SESSION_SECRET === 'super-secret-key') {
-  console.error('CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and not be a default value.');
+if (
+  !SESSION_SECRET ||
+  SESSION_SECRET.length < 32 ||
+  SESSION_SECRET === "super-secret-key"
+) {
+  console.error(
+    "CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and not be a default value.",
+  );
   process.exit(1);
 }
 
@@ -50,51 +59,59 @@ const pool = new Pool({
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: 'http://localhost:4200', // Default Angular port
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:4200", // Default Angular port
+    credentials: true,
+  }),
+);
 
 // Rate limiting configuration
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 20, // Limit each IP to 20 requests per windowMs
-  message: { error: 'Too many attempts, please try again later' }
+  message: { error: "Too many attempts, please try again later" },
 });
 
 // Session configuration
-app.use(session({
-  store: new PgSession({
-    pool: pool,
-    tableName: 'session',
-    createTableIfMissing: true
+app.use(
+  session({
+    store: new PgSession({
+      pool: pool,
+      tableName: "session",
+      createTableIfMissing: true,
+    }),
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    rolling: true, // Refresh cookie on every request
+    cookie: {
+      maxAge: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
+      httpOnly: true,
+      secure: IS_PRODUCTION,
+      sameSite: "lax",
+    },
   }),
-  secret: SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  rolling: true, // Refresh cookie on every request
-  cookie: {
-    maxAge: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
-    httpOnly: true,
-    secure: IS_PRODUCTION,
-    sameSite: 'lax'
-  }
-}));
+);
 
 // CSRF protection middleware
 app.use(lusca.csrf());
 
-app.get('/api/csrf-token', (req, res) => {
+app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: res.locals._csrf });
 });
 
 // Error handler for CSRF and other errors
 app.use((err, req, res, next) => {
-  if (err.code === 'EBADCSRFTOKEN' || err.message === 'invalid csrf token' || err.status === 403) {
-    return res.status(403).json({ error: 'Invalid CSRF token' });
+  if (
+    err.code === "EBADCSRFTOKEN" ||
+    err.message === "invalid csrf token" ||
+    err.status === 403
+  ) {
+    return res.status(403).json({ error: "Invalid CSRF token" });
   }
   console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(500).json({ error: "Internal server error" });
 });
 
 /**
@@ -113,63 +130,75 @@ async function initDb() {
 }
 
 // Routes
-app.post('/api/register', authLimiter, async (req, res) => {
+app.post("/api/register", authLimiter, async (req, res) => {
   const { username, password } = req.body;
 
   // Validation
   if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password required' });
+    return res.status(400).json({ error: "Username and password required" });
   }
 
   const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
   if (!usernameRegex.test(username)) {
     return res.status(400).json({
-      error: 'Username must be 3-20 characters long and contain only letters, numbers, and underscores'
+      error:
+        "Username must be 3-20 characters long and contain only letters, numbers, and underscores",
     });
   }
 
   if (password.length < 8) {
-    return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    return res
+      .status(400)
+      .json({ error: "Password must be at least 8 characters long" });
   }
 
   if (password.length > 128) {
-    return res.status(400).json({ error: 'Password must not exceed 128 characters' });
+    return res
+      .status(400)
+      .json({ error: "Password must not exceed 128 characters" });
   }
 
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).+$/;
   if (!passwordRegex.test(password)) {
-    return res.status(400).json({ error: 'Password must contain at least one letter and one number' });
+    return res
+      .status(400)
+      .json({
+        error: "Password must contain at least one letter and one number",
+      });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username',
-      [username, hashedPassword]
+      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username",
+      [username, hashedPassword],
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    if (err.code === '23505') { // Unique violation
-      res.status(409).json({ error: 'Username already exists' });
+    if (err.code === "23505") {
+      // Unique violation
+      res.status(409).json({ error: "Username already exists" });
     } else {
-      res.status(500).json({ error: 'Database error' });
+      res.status(500).json({ error: "Database error" });
     }
   }
 });
 
-app.post('/api/login', authLimiter, async (req, res) => {
+app.post("/api/login", authLimiter, async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password required' });
+    return res.status(400).json({ error: "Username and password required" });
   }
 
   if (password.length > 128) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    return res.status(401).json({ error: "Invalid credentials" });
   }
 
   try {
-    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    const result = await pool.query("SELECT * FROM users WHERE username = $1", [
+      username,
+    ]);
     const user = result.rows[0];
 
     // Mitigate timing attacks by always performing the comparison
@@ -179,42 +208,50 @@ app.post('/api/login', authLimiter, async (req, res) => {
     if (user && isMatch) {
       req.session.regenerate((err) => {
         if (err) {
-          return res.status(500).json({ error: 'Session regeneration failed' });
+          return res.status(500).json({ error: "Session regeneration failed" });
         }
         req.session.userId = user.id;
         req.session.username = user.username;
         req.session.save((err) => {
           if (err) {
-            return res.status(500).json({ error: 'Session save failed' });
+            return res.status(500).json({ error: "Session save failed" });
           }
           res.json({ id: user.id, username: user.username });
         });
       });
     } else {
-      res.status(401).json({ error: 'Invalid credentials' });
+      res.status(401).json({ error: "Invalid credentials" });
     }
   } catch (err) {
-    res.status(500).json({ error: 'Database error' });
+    res.status(500).json({ error: "Database error" });
   }
 });
 
-app.post('/api/logout', (req, res) => {
+app.post("/api/logout", (req, res) => {
   req.session.regenerate((err) => {
     if (err) {
-      return res.status(500).json({ error: 'Could not log out' });
+      return res.status(500).json({ error: "Could not log out" });
     }
     req.session.save((err) => {
       if (err) {
-        return res.status(500).json({ error: 'Could not log out' });
+        return res.status(500).json({ error: "Could not log out" });
       }
-      res.json({ message: 'Logged out' });
+      res.json({ message: "Logged out" });
     });
   });
 });
 
-app.get('/api/status', (req, res) => {
+app.get("/api/status", (req, res) => {
   if (req.session.userId) {
-    res.json({ authenticated: true, user: { id: req.session.userId, username: req.session.username } });
+    const isAdmin = ADMIN_USERNAME && req.session.username === ADMIN_USERNAME;
+    res.json({
+      authenticated: true,
+      user: {
+        id: req.session.userId,
+        username: req.session.username,
+        isAdmin: isAdmin,
+      },
+    });
   } else {
     res.json({ authenticated: false });
   }
@@ -223,8 +260,11 @@ app.get('/api/status', (req, res) => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Initialize the database and start the Express HTTP server on the configured port.
- * Retries connection if the database is not ready.
+ * Initialize the database and start the Express HTTP server, retrying if the database is not ready.
+ *
+ * Precomputes a dummy bcrypt hash for timing-attack mitigation, then attempts to initialize the database
+ * and start listening on the configured PORT. On an ECONNREFUSED error it retries multiple times with a
+ * short delay; if the database remains unreachable the process exits after logging diagnostic guidance.
  */
 async function startServer() {
   const maxRetries = 10;
@@ -232,7 +272,7 @@ async function startServer() {
 
   // Pre-calculate a dummy hash for timing attack mitigation
   // using the same cost factor (10) as the real password hashes.
-  dummyHash = await bcrypt.hash('dummy_password_for_timing_mitigation', 10);
+  dummyHash = await bcrypt.hash("dummy_password_for_timing_mitigation", 10);
 
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -242,16 +282,24 @@ async function startServer() {
       });
       return;
     } catch (err) {
-      if (err.code === 'ECONNREFUSED' && i < maxRetries - 1) {
-        console.log(`Database connection failed. Retrying in ${retryInterval / 1000}s... (${i + 1}/${maxRetries})`);
+      if (err.code === "ECONNREFUSED" && i < maxRetries - 1) {
+        console.log(
+          `Database connection failed. Retrying in ${retryInterval / 1000}s... (${i + 1}/${maxRetries})`,
+        );
         await sleep(retryInterval);
       } else {
-        if (err.code === 'ECONNREFUSED') {
-          console.error('CRITICAL: Could not connect to the PostgreSQL database.');
-          console.error('Ensure that your PostgreSQL server is running and accessible.');
-          console.error('If you have Docker installed, you can start the database using: npm run db:up');
+        if (err.code === "ECONNREFUSED") {
+          console.error(
+            "CRITICAL: Could not connect to the PostgreSQL database.",
+          );
+          console.error(
+            "Ensure that your PostgreSQL server is running and accessible.",
+          );
+          console.error(
+            "If you have Docker installed, you can start the database using: npm run db:up",
+          );
         } else {
-          console.error('Error starting server:', err);
+          console.error("Error starting server:", err);
         }
         process.exit(1);
       }
