@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { Component } from "@angular/core";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
-  selector: 'app-admin',
+  selector: "app-admin",
   standalone: true,
   template: `
     <div class="min-h-screen bg-gradient-to-br from-gray-900 to-black p-8">
@@ -26,7 +26,9 @@ import { AuthService } from '../../services/auth.service';
 
           <!-- Stats Card 2 -->
           <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <h3 class="text-lg font-semibold text-white mb-2">Active Sessions</h3>
+            <h3 class="text-lg font-semibold text-white mb-2">
+              Active Sessions
+            </h3>
             <p class="text-3xl font-bold text-green-400">-</p>
             <p class="text-sm text-gray-400 mt-2">Coming soon</p>
           </div>
@@ -40,7 +42,9 @@ import { AuthService } from '../../services/auth.service';
         </div>
 
         <!-- Placeholder Message -->
-        <div class="mt-8 bg-gray-800 rounded-lg p-8 border border-gray-700 text-center">
+        <div
+          class="mt-8 bg-gray-800 rounded-lg p-8 border border-gray-700 text-center"
+        >
           <svg
             class="w-16 h-16 text-gray-600 mx-auto mb-4"
             xmlns="http://www.w3.org/2000/svg"

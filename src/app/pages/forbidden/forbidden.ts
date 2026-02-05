@@ -1,20 +1,24 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component } from "@angular/core";
+import { Router } from "@angular/router";
 
 @Component({
-  selector: 'app-forbidden',
+  selector: "app-forbidden",
   standalone: true,
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center p-4">
+    <div
+      class="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center p-4"
+    >
       <div class="max-w-md w-full text-center">
         <div class="mb-8">
           <h1 class="text-9xl font-bold text-white mb-4">403</h1>
-          <h2 class="text-3xl font-semibold text-gray-300 mb-2">Access Forbidden</h2>
+          <h2 class="text-3xl font-semibold text-gray-300 mb-2">
+            Access Forbidden
+          </h2>
           <p class="text-gray-400">
             You don't have permission to access this page.
           </p>
         </div>
-        
+
         <div class="space-y-3">
           <button
             (click)="goBack()"
@@ -41,6 +45,6 @@ export class ForbiddenComponent {
   }
 
   goHome(): void {
-    this.router.navigate(['/apps']);
+    this.router.navigate(["/apps"]);
   }
 }
