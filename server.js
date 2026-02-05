@@ -260,8 +260,11 @@ app.get("/api/status", (req, res) => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Initialize the database and start the Express HTTP server on the configured port.
- * Retries connection if the database is not ready.
+ * Initialize the database and start the Express HTTP server, retrying if the database is not ready.
+ *
+ * Precomputes a dummy bcrypt hash for timing-attack mitigation, then attempts to initialize the database
+ * and start listening on the configured PORT. On an ECONNREFUSED error it retries multiple times with a
+ * short delay; if the database remains unreachable the process exits after logging diagnostic guidance.
  */
 async function startServer() {
   const maxRetries = 10;
