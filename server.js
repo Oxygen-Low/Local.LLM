@@ -291,7 +291,12 @@ app.get("/api/status", (req, res) => {
 /**
  * Returns the current update status and whether changelogs should be shown.
  */
-app.get("/api/update-status", async (req, res) => {
+const updateStatusLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30, // limit each IP to 30 requests per windowMs
+});
+
+app.get("/api/update-status", updateStatusLimiter, async (req, res) => {
   let lastUpdateAt = null;
   let currentVersion = "Unknown";
 
