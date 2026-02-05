@@ -95,6 +95,13 @@ const authLimiter = rateLimit({
   message: { error: "Too many attempts, please try again later" },
 });
 
+// General API rate limiter for status and updates
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // Higher limit for polling
+  message: { error: "Too many requests, please try again later" },
+});
+
 // Session configuration
 app.use(
   session({
@@ -119,7 +126,7 @@ app.use(
 // CSRF protection middleware
 app.use(lusca.csrf());
 
-app.get("/api/csrf-token", (req, res) => {
+app.get("/api/csrf-token", apiLimiter, (req, res) => {
   res.json({ csrfToken: res.locals._csrf });
 });
 
@@ -272,7 +279,7 @@ app.post("/api/logout", (req, res) => {
   });
 });
 
-app.get("/api/status", (req, res) => {
+app.get("/api/status", apiLimiter, (req, res) => {
   if (req.session.userId) {
     const isAdmin = ADMIN_USERNAME && req.session.username === ADMIN_USERNAME;
     res.json({
@@ -291,12 +298,7 @@ app.get("/api/status", (req, res) => {
 /**
  * Returns the current update status and whether changelogs should be shown.
  */
-const updateStatusLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 30, // limit each IP to 30 requests per windowMs
-});
-
-app.get("/api/update-status", updateStatusLimiter, async (req, res) => {
+app.get("/api/update-status", apiLimiter, async (req, res) => {
   let lastUpdateAt = null;
   let currentVersion = "Unknown";
 
@@ -329,7 +331,7 @@ app.get("/api/update-status", updateStatusLimiter, async (req, res) => {
  * Returns the content of changelogs.md and the last update timestamp.
  * Access is restricted to logged-in users, and respects AUTO_UPDATE_SHOW_CHANGELOGS for non-admins.
  */
-app.get("/api/changelogs", async (req, res) => {
+app.get("/api/changelogs", apiLimiter, async (req, res) => {
   if (!req.session.userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -463,15 +465,20 @@ function triggerRestart() {
     }
   }
 
-  const child = spawn(
-    isWindows ? "cmd.exe" : "/bin/bash",
-    isWindows ? ["/c", scriptPath] : [scriptPath],
-    {
+  let child;
+  if (isWindows) {
+    child = spawn("cmd.exe", ["/c", scriptPath], {
       detached: true,
       stdio: "ignore",
       cwd: __dirname,
-    },
-  );
+    });
+  } else {
+    child = spawn("/bin/bash", [scriptPath], {
+      detached: true,
+      stdio: "ignore",
+      cwd: __dirname,
+    });
+  }
 
   child.unref();
   process.exit(0);
