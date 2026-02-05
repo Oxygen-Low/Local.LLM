@@ -5,8 +5,8 @@
     "ng": "ng",
     "start": "concurrently \"ng serve\" \"npm run server\"",
     "server": "node server.js",
-    "db:up": "docker compose up -d",
-    "db:down": "docker compose down",
+    "db:up": "docker compose up -d || docker-compose up -d",
+    "db:down": "docker compose down || docker-compose down",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
