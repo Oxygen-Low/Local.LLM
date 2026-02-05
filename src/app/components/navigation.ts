@@ -131,6 +131,8 @@ export class NavigationComponent implements OnInit {
   sidebarOpen = signal(false);
   isMobile = signal(false);
 
+  constructor(public authService: AuthService) {}
+
   ngOnInit() {
     this.updateIsMobile();
   }
