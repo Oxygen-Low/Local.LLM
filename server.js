@@ -145,7 +145,10 @@ app.use((err, req, res, next) => {
 });
 
 /**
- * Ensure the required `users` table exists in the PostgreSQL database.
+ * Create the users and system_info tables in the database if they do not already exist.
+ *
+ * The `users` table stores account records (id, username, password, bio, is_public).
+ * The `system_info` table stores key/value metadata used for update-related state.
  */
 async function initDb() {
   // Initialize users table
@@ -367,7 +370,17 @@ app.get("/api/changelogs", apiLimiter, async (req, res) => {
 });
 
 /**
- * Checks for updates by fetching the remote main branch and comparing it with the local HEAD.
+ * Check the remote repository for updates and, if an update is available, schedule applying it.
+ *
+ * If AUTO_UPDATE is disabled or an update is already pending, this function does nothing.
+ *
+ * Side effects:
+ * - Sets `updatePending` to `true` when an update is detected.
+ * - Sets `restartAt` to the scheduled restart timestamp (now + AUTO_UPDATE_WAIT seconds).
+ * - Attempts to set `updateVersion` from the first line of `changelogs.md` on origin/main; falls back to `"Unknown"`.
+ * - Schedules `performUpdate` to run after `AUTO_UPDATE_WAIT` seconds.
+ *
+ * Errors encountered while fetching or inspecting git state are logged but do not throw.
  */
 async function checkForUpdates() {
   if (updatePending || !AUTO_UPDATE) return;
@@ -418,7 +431,10 @@ async function checkForUpdates() {
 }
 
 /**
- * Pulls the latest changes from origin/main, records the update time, and triggers a restart.
+ * Pulls updates from the repository, records the update timestamp in the database, and triggers an application restart.
+ *
+ * Attempts a `git pull origin main`; regardless of pull success, it writes or updates the `last_update_at` key in the `system_info`
+ * table with the current timestamp (if the database update fails it logs the error) and then invokes the restart procedure.
  */
 async function performUpdate() {
   console.log("Performing git pull from origin main...");
@@ -444,7 +460,13 @@ async function performUpdate() {
 }
 
 /**
- * Spawns a detached restart script and exits the current process.
+ * Start a detached platform-specific restart script and terminate the current process.
+ *
+ * Ensures the appropriate restart script (restart.bat on Windows, restart.sh on Unix) exists,
+ * attempts to set executable permissions on Unix, spawns the script as a detached child process
+ * with its working directory set to the script directory, then exits the current process.
+ *
+ * Exits with code 1 if the restart script is missing; exits with code 0 after successfully spawning the child.
  */
 function triggerRestart() {
   console.log("Triggering application restart...");
@@ -490,11 +512,11 @@ function triggerRestart() {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Initialize the database and start the Express HTTP server, retrying if the database is not ready.
+ * Initialize the database connection and start the HTTP server, retrying on transient failures.
  *
- * Precomputes a dummy bcrypt hash for timing-attack mitigation, then attempts to initialize the database
- * and start listening on the configured PORT. On an ECONNREFUSED error it retries multiple times with a
- * short delay; if the database remains unreachable the process exits after logging diagnostic guidance.
+ * Attempts to create required database schema and start the Express listener on the configured port.
+ * Precomputes a dummy bcrypt hash to mitigate timing attacks, retries up to a fixed number of times when
+ * the database connection is refused, and exits with diagnostic logs if the database remains unreachable.
  */
 async function startServer() {
   const maxRetries = 10;
