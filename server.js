@@ -2,6 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
+const { exec, spawn } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 const session = require("express-session");
 const PgSession = require("connect-pg-simple")(session);
 const rateLimit = require("express-rate-limit");
@@ -16,6 +19,25 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PRODUCTION = NODE_ENV === "production";
 const PORT = process.env.PORT || 3000;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+
+// Auto-update state
+let updatePending = false;
+let restartAt = null;
+let updateVersion = null;
+
+// Auto-update environment variables
+// Whether or not to use the automatic update system. (Default = true)
+const AUTO_UPDATE = process.env.AUTO_UPDATE !== "false";
+// In seconds, the interval between checking updates. (Default = 600)
+const AUTO_UPDATE_INTERVAL = parseInt(
+  process.env.AUTO_UPDATE_INTERVAL || "600",
+  10,
+);
+// In seconds, how long before running git pull after an update was detected. (Default = 60)
+const AUTO_UPDATE_WAIT = parseInt(process.env.AUTO_UPDATE_WAIT || "60", 10);
+// Whether or not to show changelogs.
+const AUTO_UPDATE_SHOW_CHANGELOGS =
+  process.env.AUTO_UPDATE_SHOW_CHANGELOGS === "true";
 
 // Extract and validate database environment variables
 const DB_USER = process.env.DB_USER;
@@ -118,6 +140,7 @@ app.use((err, req, res, next) => {
  * Ensure the required `users` table exists in the PostgreSQL database.
  */
 async function initDb() {
+  // Initialize users table
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -125,6 +148,14 @@ async function initDb() {
       password TEXT NOT NULL,
       bio TEXT,
       is_public BOOLEAN DEFAULT false
+    )
+  `);
+
+  // Initialize system_info table for storing update information
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS system_info (
+      key TEXT PRIMARY KEY,
+      value TEXT
     )
   `);
 }
@@ -257,6 +288,190 @@ app.get("/api/status", (req, res) => {
   }
 });
 
+/**
+ * Returns the current update status and whether changelogs should be shown.
+ */
+app.get("/api/update-status", async (req, res) => {
+  let lastUpdateAt = null;
+  let currentVersion = "Unknown";
+
+  try {
+    const lastUpdateResult = await pool.query(
+      "SELECT value FROM system_info WHERE key = 'last_update_at'",
+    );
+    lastUpdateAt = lastUpdateResult.rows[0]?.value || null;
+
+    const changelogPath = path.join(__dirname, "changelogs.md");
+    if (fs.existsSync(changelogPath)) {
+      const content = fs.readFileSync(changelogPath, "utf8");
+      currentVersion = content.split("\n")[0].trim();
+    }
+  } catch (err) {
+    console.error("Error fetching update status details:", err);
+  }
+
+  res.json({
+    updatePending,
+    restartAt,
+    updateVersion, // This is the version of the PENDING update
+    currentVersion, // This is the version currently installed
+    lastUpdateAt,
+    autoUpdateShowChangelogs: AUTO_UPDATE_SHOW_CHANGELOGS,
+  });
+});
+
+/**
+ * Returns the content of changelogs.md and the last update timestamp.
+ * Access is restricted to logged-in users, and respects AUTO_UPDATE_SHOW_CHANGELOGS for non-admins.
+ */
+app.get("/api/changelogs", async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const isAdmin = ADMIN_USERNAME && req.session.username === ADMIN_USERNAME;
+
+  // If changelogs are disabled, only admins can view them
+  if (!AUTO_UPDATE_SHOW_CHANGELOGS && !isAdmin) {
+    return res.status(403).json({ error: "Access denied" });
+  }
+
+  try {
+    const changelogPath = path.join(__dirname, "changelogs.md");
+    let content = "";
+    if (fs.existsSync(changelogPath)) {
+      content = fs.readFileSync(changelogPath, "utf8");
+    }
+
+    const lastUpdateResult = await pool.query(
+      "SELECT value FROM system_info WHERE key = 'last_update_at'",
+    );
+    const lastUpdateAt = lastUpdateResult.rows[0]?.value || null;
+
+    res.json({
+      content,
+      lastUpdateAt,
+    });
+  } catch (err) {
+    console.error("Error reading changelogs:", err);
+    res.status(500).json({ error: "Could not read changelogs" });
+  }
+});
+
+/**
+ * Checks for updates by fetching the remote main branch and comparing it with the local HEAD.
+ */
+async function checkForUpdates() {
+  if (updatePending || !AUTO_UPDATE) return;
+
+  console.log("Checking for updates...");
+  exec("git fetch origin main", (err) => {
+    if (err) {
+      console.error("Update check failed (fetch):", err);
+      return;
+    }
+
+    exec("git rev-parse HEAD", (err, stdoutHead) => {
+      if (err) {
+        console.error("Error getting local HEAD:", err);
+        return;
+      }
+      const local = stdoutHead.trim();
+
+      exec("git rev-parse origin/main", (err, stdoutRemote) => {
+        if (err) {
+          console.error("Error getting origin/main HEAD:", err);
+          return;
+        }
+        const remote = stdoutRemote.trim();
+
+        // If local and remote differ, an update is available
+        if (local !== remote) {
+          console.log(`Update detected! Local: ${local}, Remote: ${remote}`);
+          updatePending = true;
+          restartAt = Date.now() + AUTO_UPDATE_WAIT * 1000;
+
+          // Attempt to get the new version from the remote changelogs.md
+          exec("git show origin/main:changelogs.md", (err, stdoutChangelog) => {
+            if (!err) {
+              updateVersion = stdoutChangelog.split("\n")[0].trim();
+            } else {
+              updateVersion = "Unknown";
+            }
+            console.log(`Update Version: ${updateVersion}`);
+          });
+
+          // Schedule the pull and restart
+          setTimeout(performUpdate, AUTO_UPDATE_WAIT * 1000);
+        }
+      });
+    });
+  });
+}
+
+/**
+ * Pulls the latest changes from origin/main, records the update time, and triggers a restart.
+ */
+async function performUpdate() {
+  console.log("Performing git pull from origin main...");
+  exec("git pull origin main", async (err) => {
+    if (err) {
+      console.error("Git pull failed:", err);
+      // Proceeding with restart anyway as we are in an update cycle
+    }
+
+    try {
+      // Record the last update timestamp in the database
+      const now = new Date().toISOString();
+      await pool.query(
+        "INSERT INTO system_info (key, value) VALUES ('last_update_at', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
+        [now],
+      );
+    } catch (dbErr) {
+      console.error("Failed to update last_update_at in database:", dbErr);
+    }
+
+    triggerRestart();
+  });
+}
+
+/**
+ * Spawns a detached restart script and exits the current process.
+ */
+function triggerRestart() {
+  console.log("Triggering application restart...");
+  const isWindows = process.platform === "win32";
+  const scriptName = isWindows ? "restart.bat" : "restart.sh";
+  const scriptPath = path.join(__dirname, scriptName);
+
+  if (!fs.existsSync(scriptPath)) {
+    console.error(`Restart script not found at ${scriptPath}`);
+    process.exit(1);
+  }
+
+  // Make sure the script is executable on Unix systems
+  if (!isWindows) {
+    try {
+      fs.chmodSync(scriptPath, "755");
+    } catch (e) {
+      console.error("Failed to set executable permissions on restart script");
+    }
+  }
+
+  const child = spawn(
+    isWindows ? "cmd.exe" : "/bin/bash",
+    isWindows ? ["/c", scriptPath] : [scriptPath],
+    {
+      detached: true,
+      stdio: "ignore",
+      cwd: __dirname,
+    },
+  );
+
+  child.unref();
+  process.exit(0);
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
@@ -279,6 +494,16 @@ async function startServer() {
       await initDb();
       app.listen(PORT, () => {
         console.log(`Server running at http://localhost:${PORT}`);
+
+        // Start the update check interval if enabled
+        if (AUTO_UPDATE) {
+          console.log(
+            `Auto-update system active. Checking every ${AUTO_UPDATE_INTERVAL} seconds.`,
+          );
+          setInterval(checkForUpdates, AUTO_UPDATE_INTERVAL * 1000);
+          // Also check once on startup
+          setTimeout(checkForUpdates, 5000);
+        }
       });
       return;
     } catch (err) {

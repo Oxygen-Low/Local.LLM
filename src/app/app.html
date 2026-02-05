@@ -1,8 +1,19 @@
-<div class="flex h-screen overflow-hidden" style="background-color: #282828">
-  @if (showNavigation()) {
-    <app-navigation></app-navigation>
-  }
-  <main class="flex-1 overflow-auto w-full md:w-auto">
-    <router-outlet></router-outlet>
-  </main>
+<div
+  class="flex flex-col h-screen overflow-hidden"
+  style="background-color: #282828"
+>
+  <!-- Global Update Countdown Banner -->
+  <app-countdown-banner></app-countdown-banner>
+
+  <div class="flex flex-1 overflow-hidden">
+    @if (showNavigation()) {
+      <app-navigation></app-navigation>
+    }
+    <main class="flex-1 overflow-auto w-full md:w-auto">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- New Update Notification Pop-up -->
+  <app-update-notification></app-update-notification>
 </div>

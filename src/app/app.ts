@@ -1,13 +1,20 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { NavigationComponent } from "./components/navigation";
+import { CountdownBannerComponent } from "./components/countdown-banner";
+import { UpdateNotificationComponent } from "./components/update-notification";
 
 import { filter } from "rxjs/operators";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [RouterOutlet, NavigationComponent],
+  imports: [
+    RouterOutlet,
+    NavigationComponent,
+    CountdownBannerComponent,
+    UpdateNotificationComponent,
+  ],
   templateUrl: "./app.html",
   styleUrl: "./app.css",
 })
