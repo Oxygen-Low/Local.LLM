@@ -35,6 +35,8 @@ if (!SESSION_SECRET || SESSION_SECRET.length < 32 || SESSION_SECRET === 'super-s
 
 const app = express();
 
+let dummyHash;
+
 // Database connection
 const pool = new Pool({
   user: DB_USER,
@@ -135,6 +137,10 @@ app.post('/api/register', authLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Password must be at least 8 characters long' });
   }
 
+  if (password.length > 128) {
+    return res.status(400).json({ error: 'Password must not exceed 128 characters' });
+  }
+
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).+$/;
   if (!passwordRegex.test(password)) {
     return res.status(400).json({ error: 'Password must contain at least one letter and one number' });
@@ -158,11 +164,20 @@ app.post('/api/register', authLimiter, async (req, res) => {
 
 app.post('/api/login', authLimiter, async (req, res) => {
   const { username, password } = req.body;
+
+  if (password && password.length > 128) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+
   try {
     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     const user = result.rows[0];
 
-    if (user && await bcrypt.compare(password, user.password)) {
+    // Mitigate timing attacks by always performing the comparison
+    const targetHash = user ? user.password : dummyHash;
+    const isMatch = await bcrypt.compare(password, targetHash);
+
+    if (user && isMatch) {
       req.session.regenerate((err) => {
         if (err) {
           return res.status(500).json({ error: 'Session regeneration failed' });
@@ -189,7 +204,12 @@ app.post('/api/logout', (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Could not log out' });
     }
-    res.json({ message: 'Logged out' });
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Could not log out' });
+      }
+      res.json({ message: 'Logged out' });
+    });
   });
 });
 
@@ -210,6 +230,10 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function startServer() {
   const maxRetries = 10;
   const retryInterval = 2000; // 2 seconds
+
+  // Pre-calculate a dummy hash for timing attack mitigation
+  // using the same cost factor (10) as the real password hashes.
+  dummyHash = await bcrypt.hash('dummy_password_for_timing_mitigation', 10);
 
   for (let i = 0; i < maxRetries; i++) {
     try {
