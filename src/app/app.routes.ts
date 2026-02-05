@@ -1,5 +1,6 @@
 import { Routes } from "@angular/router";
 import { authGuard } from "./guards/auth.guard";
+import { adminGuard } from "./guards/admin.guard";
 
 export const routes: Routes = [
   {
@@ -35,6 +36,17 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import("./pages/social/social").then((m) => m.SocialMediaSimComponent),
+  },
+  {
+    path: "admin",
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import("./pages/admin/admin").then((m) => m.AdminComponent),
+  },
+  {
+    path: "403",
+    loadComponent: () =>
+      import("./pages/forbidden/forbidden").then((m) => m.ForbiddenComponent),
   },
   {
     path: "auth",
