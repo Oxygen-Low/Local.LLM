@@ -37,7 +37,7 @@ const AUTO_UPDATE_INTERVAL = parseInt(
 const AUTO_UPDATE_WAIT = parseInt(process.env.AUTO_UPDATE_WAIT || "60", 10);
 // Whether or not to show changelogs.
 const AUTO_UPDATE_SHOW_CHANGELOGS =
-  process.env.AUTO_UPDATE_SHOW_CHANGELOGS === "true";
+  process.env.AUTO_UPDATE_SHOW_CHANGELOGS !== "false";
 
 // Extract and validate database environment variables
 const DB_USER = process.env.DB_USER;
