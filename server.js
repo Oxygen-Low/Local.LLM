@@ -165,7 +165,11 @@ app.post('/api/register', authLimiter, async (req, res) => {
 app.post('/api/login', authLimiter, async (req, res) => {
   const { username, password } = req.body;
 
-  if (password && password.length > 128) {
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password required' });
+  }
+
+  if (password.length > 128) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
