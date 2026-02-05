@@ -215,7 +215,15 @@ app.post('/api/logout', (req, res) => {
 
 app.get('/api/status', (req, res) => {
   if (req.session.userId) {
-    res.json({ authenticated: true, user: { id: req.session.userId, username: req.session.username } });
+    const isAdmin = ADMIN_USERNAME && req.session.username === ADMIN_USERNAME;
+    res.json({
+      authenticated: true,
+      user: {
+        id: req.session.userId,
+        username: req.session.username,
+        isAdmin: isAdmin
+      }
+    });
   } else {
     res.json({ authenticated: false });
   }
