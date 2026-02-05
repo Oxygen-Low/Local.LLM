@@ -102,6 +102,7 @@ const apiLimiter = rateLimit({
   message: { error: "Too many requests, please try again later" },
 });
 
+
 // Session configuration
 app.use(
   session({
@@ -467,14 +468,15 @@ function triggerRestart() {
 
   let child;
   if (isWindows) {
-    // On Windows, execute the restart script directly to avoid shell interpretation of the path.
-    child = spawn(scriptPath, [], {
+    // Use completely hardcoded strings for spawn to satisfy CodeQL
+    child = spawn("cmd.exe", ["/c", "restart.bat"], {
       detached: true,
       stdio: "ignore",
       cwd: __dirname,
     });
   } else {
-    child = spawn("/bin/bash", [scriptPath], {
+    // Use completely hardcoded strings for spawn to satisfy CodeQL
+    child = spawn("/bin/bash", ["./restart.sh"], {
       detached: true,
       stdio: "ignore",
       cwd: __dirname,
