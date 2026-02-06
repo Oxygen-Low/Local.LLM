@@ -56,6 +56,12 @@ const pool = new Pool({
 });
 
 // Middleware
+if (IS_PRODUCTION) {
+  // Trust the first proxy (e.g. Cloudflare, Nginx, Heroku router)
+  // Essential for correct IP detection in rate limiting and secure cookies
+  app.set("trust proxy", 1);
+}
+
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
