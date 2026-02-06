@@ -2,6 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
+const { exec, spawn } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 const session = require("express-session");
 const PgSession = require("connect-pg-simple")(session);
 const rateLimit = require("express-rate-limit");
@@ -16,6 +19,45 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PRODUCTION = NODE_ENV === "production";
 const PORT = process.env.PORT || 3000;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+
+// Auto-update state
+let updatePending = false;
+let restartAt = null;
+let updateVersion = null;
+let pendingRemoteSha = null;
+let currentVersionCache = "Unknown";
+
+/**
+ * Update the module-level cached current version from the changelogs.md file.
+ *
+ * If changelogs.md exists, reads its first line, trims it, and stores it in
+ * `currentVersionCache`. On any filesystem error the cache is left unchanged
+ * and an error is logged to the console.
+ */
+function refreshCurrentVersion() {
+  try {
+    const changelogPath = path.join(__dirname, "changelogs.md");
+    if (fs.existsSync(changelogPath)) {
+      const content = fs.readFileSync(changelogPath, "utf8");
+      currentVersionCache = content.split("\n")[0].trim();
+    }
+  } catch (err) {
+    console.error("Error refreshing current version cache:", err);
+  }
+}
+
+// Auto-update environment variables
+// Whether or not to use the automatic update system. (Default = true)
+const AUTO_UPDATE = process.env.AUTO_UPDATE !== "false";
+// In seconds, the interval between checking updates. (Default = 600)
+const parsedInterval = parseInt(process.env.AUTO_UPDATE_INTERVAL, 10);
+const AUTO_UPDATE_INTERVAL = Number.isNaN(parsedInterval) ? 600 : parsedInterval;
+// In seconds, how long before running git pull after an update was detected. (Default = 60)
+const parsedWait = parseInt(process.env.AUTO_UPDATE_WAIT, 10);
+const AUTO_UPDATE_WAIT = Number.isNaN(parsedWait) ? 60 : parsedWait;
+// Whether or not to show changelogs.
+const AUTO_UPDATE_SHOW_CHANGELOGS =
+  process.env.AUTO_UPDATE_SHOW_CHANGELOGS !== "false";
 
 // Extract and validate database environment variables
 const DB_USER = process.env.DB_USER;
@@ -79,6 +121,14 @@ const authLimiter = rateLimit({
   message: { error: "Too many attempts, please try again later" },
 });
 
+// General API rate limiter for status and updates
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // Higher limit for polling
+  message: { error: "Too many requests, please try again later" },
+});
+
+
 // Session configuration
 app.use(
   session({
@@ -103,7 +153,7 @@ app.use(
 // CSRF protection middleware
 app.use(lusca.csrf());
 
-app.get("/api/csrf-token", (req, res) => {
+app.get("/api/csrf-token", apiLimiter, (req, res) => {
   res.json({ csrfToken: res.locals._csrf });
 });
 
@@ -121,9 +171,13 @@ app.use((err, req, res, next) => {
 });
 
 /**
- * Ensure the required `users` table exists in the PostgreSQL database.
+ * Create the users and system_info tables in the database if they do not already exist.
+ *
+ * The `users` table stores account records (id, username, password, bio, is_public).
+ * The `system_info` table stores key/value metadata used for update-related state.
  */
 async function initDb() {
+  // Initialize users table
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -131,6 +185,14 @@ async function initDb() {
       password TEXT NOT NULL,
       bio TEXT,
       is_public BOOLEAN DEFAULT false
+    )
+  `);
+
+  // Initialize system_info table for storing update information
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS system_info (
+      key TEXT PRIMARY KEY,
+      value TEXT
     )
   `);
 }
@@ -247,7 +309,7 @@ app.post("/api/logout", (req, res) => {
   });
 });
 
-app.get("/api/status", (req, res) => {
+app.get("/api/status", apiLimiter, (req, res) => {
   if (req.session.userId) {
     const isAdmin = ADMIN_USERNAME && req.session.username === ADMIN_USERNAME;
     res.json({
@@ -263,18 +325,263 @@ app.get("/api/status", (req, res) => {
   }
 });
 
+/**
+ * Returns the current update status and whether changelogs should be shown.
+ * Access is restricted to logged-in users.
+ */
+app.get("/api/update-status", apiLimiter, async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  let lastUpdateAt = null;
+
+  try {
+    const lastUpdateResult = await pool.query(
+      "SELECT value FROM system_info WHERE key = 'last_update_at'",
+    );
+    lastUpdateAt = lastUpdateResult.rows[0]?.value || null;
+  } catch (err) {
+    console.error("Error fetching update status details:", err);
+  }
+
+  res.json({
+    updatePending,
+    restartAt,
+    updateVersion, // This is the version of the PENDING update
+    currentVersion: currentVersionCache, // This is the version currently installed (cached)
+    lastUpdateAt,
+    autoUpdateShowChangelogs: AUTO_UPDATE_SHOW_CHANGELOGS,
+  });
+});
+
+/**
+ * Returns the content of changelogs.md and the last update timestamp.
+ * Access is restricted to logged-in users, and respects AUTO_UPDATE_SHOW_CHANGELOGS for non-admins.
+ */
+app.get("/api/changelogs", apiLimiter, async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const isAdmin = ADMIN_USERNAME && req.session.username === ADMIN_USERNAME;
+
+  // If changelogs are disabled, only admins can view them
+  if (!AUTO_UPDATE_SHOW_CHANGELOGS && !isAdmin) {
+    return res.status(403).json({ error: "Access denied" });
+  }
+
+  try {
+    const changelogPath = path.join(__dirname, "changelogs.md");
+    let content = "";
+    if (fs.existsSync(changelogPath)) {
+      content = fs.readFileSync(changelogPath, "utf8");
+    }
+
+    const lastUpdateResult = await pool.query(
+      "SELECT value FROM system_info WHERE key = 'last_update_at'",
+    );
+    const lastUpdateAt = lastUpdateResult.rows[0]?.value || null;
+
+    res.json({
+      content,
+      lastUpdateAt,
+    });
+  } catch (err) {
+    console.error("Error reading changelogs:", err);
+    res.status(500).json({ error: "Could not read changelogs" });
+  }
+});
+
+/**
+ * Check the remote Git repository for a newer commit and, if found, schedule applying the update.
+ *
+ * If AUTO_UPDATE is disabled or an update is already pending, this function returns without action.
+ *
+ * Side effects:
+ * - Marks `updatePending` true and stores the remote SHA in `pendingRemoteSha`.
+ * - Sets `restartAt` to now + AUTO_UPDATE_WAIT seconds.
+ * - Attempts to set `updateVersion` from the first line of `changelogs.md` on origin/main, falling back to `"Unknown"`.
+ * - Schedules `performUpdate` to run after AUTO_UPDATE_WAIT seconds.
+ * - Reads `failed_remote_sha` from the `system_info` table and skips the update if it matches the remote SHA.
+ *
+ * Errors encountered while inspecting Git state or querying the database are logged and do not throw.
+ */
+async function checkForUpdates() {
+  if (updatePending || !AUTO_UPDATE) return;
+
+  console.log("Checking for updates...");
+  exec("git fetch origin main", async (err) => {
+    if (err) {
+      console.error("Update check failed (fetch):", err);
+      return;
+    }
+
+    exec("git rev-parse HEAD", async (err, stdoutHead) => {
+      if (err) {
+        console.error("Error getting local HEAD:", err);
+        return;
+      }
+      const local = stdoutHead.trim();
+
+      exec("git rev-parse origin/main", async (err, stdoutRemote) => {
+        if (err) {
+          console.error("Error getting origin/main HEAD:", err);
+          return;
+        }
+        const remote = stdoutRemote.trim();
+
+        // Check if this remote SHA has failed before
+        try {
+          const failedResult = await pool.query(
+            "SELECT value FROM system_info WHERE key = 'failed_remote_sha'",
+          );
+          if (failedResult.rows[0]?.value === remote) {
+            console.log(`Skipping update as remote SHA ${remote} previously failed.`);
+            return;
+          }
+        } catch (dbErr) {
+          console.error("Error checking failed_remote_sha:", dbErr);
+        }
+
+        // If local and remote differ, an update is available
+        if (local !== remote) {
+          console.log(`Update detected! Local: ${local}, Remote: ${remote}`);
+          updatePending = true;
+          pendingRemoteSha = remote;
+          restartAt = Date.now() + AUTO_UPDATE_WAIT * 1000;
+
+          // Attempt to get the new version from the remote changelogs.md
+          exec("git show origin/main:changelogs.md", (err, stdoutChangelog) => {
+            if (!err) {
+              updateVersion = stdoutChangelog.split("\n")[0].trim();
+            } else {
+              updateVersion = "Unknown";
+            }
+            console.log(`Update Version: ${updateVersion}`);
+          });
+
+          // Schedule the pull and restart
+          setTimeout(performUpdate, AUTO_UPDATE_WAIT * 1000);
+        }
+      });
+    });
+  });
+}
+
+/**
+ * Pull and apply repository updates, record the update time, and initiate a restart.
+ *
+ * If the update succeeds, writes or updates the `last_update_at` key in the `system_info` table with the current timestamp and then triggers the application restart procedure. If the update fails and a pending remote SHA exists, stores that SHA under `failed_remote_sha` in `system_info` and clears pending update state.
+ */
+async function performUpdate() {
+  console.log("Performing git pull from origin main...");
+  exec("git pull origin main", async (err) => {
+    if (err) {
+      console.error("Git pull failed:", err);
+      if (pendingRemoteSha) {
+        try {
+          await pool.query(
+            "INSERT INTO system_info (key, value) VALUES ('failed_remote_sha', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
+            [pendingRemoteSha],
+          );
+        } catch (dbErr) {
+          console.error("Failed to store failed_remote_sha:", dbErr);
+        }
+      }
+      updatePending = false;
+      pendingRemoteSha = null;
+      return;
+    }
+
+    // Update the version cache after a successful pull
+    refreshCurrentVersion();
+
+    try {
+      // Record the last update timestamp in the database
+      const now = new Date().toISOString();
+      await pool.query(
+        "INSERT INTO system_info (key, value) VALUES ('last_update_at', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
+        [now],
+      );
+    } catch (dbErr) {
+      console.error("Failed to update last_update_at in database:", dbErr);
+    }
+
+    triggerRestart();
+  });
+}
+
+/**
+ * Start a detached, platform-specific restart script and terminate the current process.
+ *
+ * If the required restart script is missing or cannot be spawned, exits with code 1.
+ * On successful spawn, exits with code 0 after detaching the child process.
+ */
+function triggerRestart() {
+  console.log("Triggering application restart...");
+  const isWindows = process.platform === "win32";
+  const scriptName = isWindows ? "restart.bat" : "restart.sh";
+  const scriptPath = path.join(__dirname, scriptName);
+
+  if (!fs.existsSync(scriptPath)) {
+    console.error(`Restart script not found at ${scriptPath}`);
+    process.exit(1);
+  }
+
+  // Make sure the script is executable on Unix systems
+  if (!isWindows) {
+    try {
+      fs.chmodSync(scriptPath, "755");
+    } catch (e) {
+      console.error("Failed to set executable permissions on restart script");
+    }
+  }
+
+  try {
+    let child;
+    if (isWindows) {
+      // Use completely hardcoded strings for spawn to satisfy CodeQL
+      child = spawn("cmd.exe", ["/c", "restart.bat"], {
+        detached: true,
+        stdio: "ignore",
+        cwd: __dirname,
+      });
+    } else {
+      // Use completely hardcoded strings for spawn to satisfy CodeQL
+      child = spawn("/bin/bash", ["./restart.sh"], {
+        detached: true,
+        stdio: "ignore",
+        cwd: __dirname,
+      });
+    }
+
+    if (child) {
+      child.unref();
+      process.exit(0);
+    }
+  } catch (err) {
+    console.error("Error during spawn of restart script:", err);
+    process.exit(1);
+  }
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Initialize the database and start the Express HTTP server, retrying if the database is not ready.
+ * Start the HTTP server after ensuring required database schema exists, retrying on transient failures.
  *
- * Precomputes a dummy bcrypt hash for timing-attack mitigation, then attempts to initialize the database
- * and start listening on the configured PORT. On an ECONNREFUSED error it retries multiple times with a
- * short delay; if the database remains unreachable the process exits after logging diagnostic guidance.
+ * Initializes the database and starts the Express listener on the configured port. If the database
+ * connection is refused, retries initialization up to a fixed number of attempts with a short delay;
+ * logs diagnostic messages and exits the process if the database remains unreachable. When auto-update
+ * is enabled, schedules periodic update checks after the server starts.
  */
 async function startServer() {
   const maxRetries = 10;
   const retryInterval = 2000; // 2 seconds
+
+  // Initialize the current version cache
+  refreshCurrentVersion();
 
   // Pre-calculate a dummy hash for timing attack mitigation
   // using the same cost factor (10) as the real password hashes.
@@ -285,6 +592,16 @@ async function startServer() {
       await initDb();
       app.listen(PORT, () => {
         console.log(`Server running at http://localhost:${PORT}`);
+
+        // Start the update check interval if enabled
+        if (AUTO_UPDATE) {
+          console.log(
+            `Auto-update system active. Checking every ${AUTO_UPDATE_INTERVAL} seconds.`,
+          );
+          setInterval(checkForUpdates, AUTO_UPDATE_INTERVAL * 1000);
+          // Also check once on startup
+          setTimeout(checkForUpdates, 5000);
+        }
       });
       return;
     } catch (err) {

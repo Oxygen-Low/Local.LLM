@@ -1,0 +1,9 @@
+@echo off
+:: Wait for the server to exit
+timeout /t 2 /nobreak
+echo Stopping database...
+call npm run db:down
+echo Starting database...
+call npm run db:up
+echo Starting application...
+call npm start

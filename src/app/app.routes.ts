@@ -53,4 +53,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import("./pages/auth/auth").then((m) => m.AuthComponent),
   },
+  {
+    path: "changelogs",
+    loadComponent: () =>
+      import("./pages/changelogs/changelogs").then((m) => m.ChangelogsComponent),
+  },
 ];

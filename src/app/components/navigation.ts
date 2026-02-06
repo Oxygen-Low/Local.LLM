@@ -55,6 +55,15 @@ import { AuthService } from "../services/auth.service";
               Admin
             </a>
           }
+          @if (authService.isAuthenticated()) {
+            <a
+              routerLink="/changelogs"
+              routerLinkActive="text-white bg-gray-900"
+              class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
+            >
+              Changelogs
+            </a>
+          }
         </div>
       </div>
 
