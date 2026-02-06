@@ -80,7 +80,7 @@ if (
   SESSION_SECRET === "super-secret-key"
 ) {
   console.error(
-    `CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and not be a default value. (Current length: ${SESSION_SECRET ? SESSION_SECRET.length : 0})`,
+    "CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and must not use the default value.",
   );
   console.error(
     "HINT: If your secret contains '#' it must be wrapped in single quotes (e.g., SESSION_SECRET='abc#123').",
