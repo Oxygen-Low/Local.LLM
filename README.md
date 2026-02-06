@@ -1,4 +1,5 @@
 # Local.LLM
+- Chat and develop with your favourite characters!
 
 Local.LLM is a community focused ai platform that provides tools for almost anyone.
 
