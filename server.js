@@ -28,7 +28,11 @@ let pendingRemoteSha = null;
 let currentVersionCache = "Unknown";
 
 /**
- * Reads the first line of changelogs.md and updates the currentVersionCache.
+ * Update the module-level cached current version from the changelogs.md file.
+ *
+ * If changelogs.md exists, reads its first line, trims it, and stores it in
+ * `currentVersionCache`. On any filesystem error the cache is left unchanged
+ * and an error is logged to the console.
  */
 function refreshCurrentVersion() {
   try {
@@ -384,17 +388,18 @@ app.get("/api/changelogs", apiLimiter, async (req, res) => {
 });
 
 /**
- * Check the remote repository for updates and, if an update is available, schedule applying it.
+ * Check the remote Git repository for a newer commit and, if found, schedule applying the update.
  *
- * If AUTO_UPDATE is disabled or an update is already pending, this function does nothing.
+ * If AUTO_UPDATE is disabled or an update is already pending, this function returns without action.
  *
  * Side effects:
- * - Sets `updatePending` to `true` when an update is detected.
- * - Sets `restartAt` to the scheduled restart timestamp (now + AUTO_UPDATE_WAIT seconds).
- * - Attempts to set `updateVersion` from the first line of `changelogs.md` on origin/main; falls back to `"Unknown"`.
- * - Schedules `performUpdate` to run after `AUTO_UPDATE_WAIT` seconds.
+ * - Marks `updatePending` true and stores the remote SHA in `pendingRemoteSha`.
+ * - Sets `restartAt` to now + AUTO_UPDATE_WAIT seconds.
+ * - Attempts to set `updateVersion` from the first line of `changelogs.md` on origin/main, falling back to `"Unknown"`.
+ * - Schedules `performUpdate` to run after AUTO_UPDATE_WAIT seconds.
+ * - Reads `failed_remote_sha` from the `system_info` table and skips the update if it matches the remote SHA.
  *
- * Errors encountered while fetching or inspecting git state are logged but do not throw.
+ * Errors encountered while inspecting Git state or querying the database are logged and do not throw.
  */
 async function checkForUpdates() {
   if (updatePending || !AUTO_UPDATE) return;
@@ -459,11 +464,9 @@ async function checkForUpdates() {
 }
 
 /**
- * Pulls updates from the repository, records the update timestamp in the database, and triggers an application restart.
+ * Pull and apply repository updates, record the update time, and initiate a restart.
  *
- * Attempts a `git pull origin main`; if successful, it writes or updates the `last_update_at` key in the `system_info`
- * table with the current timestamp and then invokes the restart procedure.
- * If the pull fails, it records the failed SHA in the database and cancels the restart.
+ * If the update succeeds, writes or updates the `last_update_at` key in the `system_info` table with the current timestamp and then triggers the application restart procedure. If the update fails and a pending remote SHA exists, stores that SHA under `failed_remote_sha` in `system_info` and clears pending update state.
  */
 async function performUpdate() {
   console.log("Performing git pull from origin main...");
@@ -504,13 +507,10 @@ async function performUpdate() {
 }
 
 /**
- * Start a detached platform-specific restart script and terminate the current process.
+ * Start a detached, platform-specific restart script and terminate the current process.
  *
- * Ensures the appropriate restart script (restart.bat on Windows, restart.sh on Unix) exists,
- * attempts to set executable permissions on Unix, spawns the script as a detached child process
- * with its working directory set to the script directory, then exits the current process.
- *
- * Exits with code 1 if the restart script is missing; exits with code 0 after successfully spawning the child.
+ * If the required restart script is missing or cannot be spawned, exits with code 1.
+ * On successful spawn, exits with code 0 after detaching the child process.
  */
 function triggerRestart() {
   console.log("Triggering application restart...");
@@ -563,11 +563,12 @@ function triggerRestart() {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Initialize the database connection and start the HTTP server, retrying on transient failures.
+ * Start the HTTP server after ensuring required database schema exists, retrying on transient failures.
  *
- * Attempts to create required database schema and start the Express listener on the configured port.
- * Precomputes a dummy bcrypt hash to mitigate timing attacks, retries up to a fixed number of times when
- * the database connection is refused, and exits with diagnostic logs if the database remains unreachable.
+ * Initializes the database and starts the Express listener on the configured port. If the database
+ * connection is refused, retries initialization up to a fixed number of attempts with a short delay;
+ * logs diagnostic messages and exits the process if the database remains unreachable. When auto-update
+ * is enabled, schedules periodic update checks after the server starts.
  */
 async function startServer() {
   const maxRetries = 10;
