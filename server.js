@@ -24,17 +24,33 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 let updatePending = false;
 let restartAt = null;
 let updateVersion = null;
+let pendingRemoteSha = null;
+let currentVersionCache = "Unknown";
+
+/**
+ * Reads the first line of changelogs.md and updates the currentVersionCache.
+ */
+function refreshCurrentVersion() {
+  try {
+    const changelogPath = path.join(__dirname, "changelogs.md");
+    if (fs.existsSync(changelogPath)) {
+      const content = fs.readFileSync(changelogPath, "utf8");
+      currentVersionCache = content.split("\n")[0].trim();
+    }
+  } catch (err) {
+    console.error("Error refreshing current version cache:", err);
+  }
+}
 
 // Auto-update environment variables
 // Whether or not to use the automatic update system. (Default = true)
 const AUTO_UPDATE = process.env.AUTO_UPDATE !== "false";
 // In seconds, the interval between checking updates. (Default = 600)
-const AUTO_UPDATE_INTERVAL = parseInt(
-  process.env.AUTO_UPDATE_INTERVAL || "600",
-  10,
-);
+const parsedInterval = parseInt(process.env.AUTO_UPDATE_INTERVAL, 10);
+const AUTO_UPDATE_INTERVAL = Number.isNaN(parsedInterval) ? 600 : parsedInterval;
 // In seconds, how long before running git pull after an update was detected. (Default = 60)
-const AUTO_UPDATE_WAIT = parseInt(process.env.AUTO_UPDATE_WAIT || "60", 10);
+const parsedWait = parseInt(process.env.AUTO_UPDATE_WAIT, 10);
+const AUTO_UPDATE_WAIT = Number.isNaN(parsedWait) ? 60 : parsedWait;
 // Whether or not to show changelogs.
 const AUTO_UPDATE_SHOW_CHANGELOGS =
   process.env.AUTO_UPDATE_SHOW_CHANGELOGS !== "false";
@@ -301,22 +317,20 @@ app.get("/api/status", apiLimiter, (req, res) => {
 
 /**
  * Returns the current update status and whether changelogs should be shown.
+ * Access is restricted to logged-in users.
  */
 app.get("/api/update-status", apiLimiter, async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   let lastUpdateAt = null;
-  let currentVersion = "Unknown";
 
   try {
     const lastUpdateResult = await pool.query(
       "SELECT value FROM system_info WHERE key = 'last_update_at'",
     );
     lastUpdateAt = lastUpdateResult.rows[0]?.value || null;
-
-    const changelogPath = path.join(__dirname, "changelogs.md");
-    if (fs.existsSync(changelogPath)) {
-      const content = fs.readFileSync(changelogPath, "utf8");
-      currentVersion = content.split("\n")[0].trim();
-    }
   } catch (err) {
     console.error("Error fetching update status details:", err);
   }
@@ -325,7 +339,7 @@ app.get("/api/update-status", apiLimiter, async (req, res) => {
     updatePending,
     restartAt,
     updateVersion, // This is the version of the PENDING update
-    currentVersion, // This is the version currently installed
+    currentVersion: currentVersionCache, // This is the version currently installed (cached)
     lastUpdateAt,
     autoUpdateShowChangelogs: AUTO_UPDATE_SHOW_CHANGELOGS,
   });
@@ -386,30 +400,44 @@ async function checkForUpdates() {
   if (updatePending || !AUTO_UPDATE) return;
 
   console.log("Checking for updates...");
-  exec("git fetch origin main", (err) => {
+  exec("git fetch origin main", async (err) => {
     if (err) {
       console.error("Update check failed (fetch):", err);
       return;
     }
 
-    exec("git rev-parse HEAD", (err, stdoutHead) => {
+    exec("git rev-parse HEAD", async (err, stdoutHead) => {
       if (err) {
         console.error("Error getting local HEAD:", err);
         return;
       }
       const local = stdoutHead.trim();
 
-      exec("git rev-parse origin/main", (err, stdoutRemote) => {
+      exec("git rev-parse origin/main", async (err, stdoutRemote) => {
         if (err) {
           console.error("Error getting origin/main HEAD:", err);
           return;
         }
         const remote = stdoutRemote.trim();
 
+        // Check if this remote SHA has failed before
+        try {
+          const failedResult = await pool.query(
+            "SELECT value FROM system_info WHERE key = 'failed_remote_sha'",
+          );
+          if (failedResult.rows[0]?.value === remote) {
+            console.log(`Skipping update as remote SHA ${remote} previously failed.`);
+            return;
+          }
+        } catch (dbErr) {
+          console.error("Error checking failed_remote_sha:", dbErr);
+        }
+
         // If local and remote differ, an update is available
         if (local !== remote) {
           console.log(`Update detected! Local: ${local}, Remote: ${remote}`);
           updatePending = true;
+          pendingRemoteSha = remote;
           restartAt = Date.now() + AUTO_UPDATE_WAIT * 1000;
 
           // Attempt to get the new version from the remote changelogs.md
@@ -433,16 +461,32 @@ async function checkForUpdates() {
 /**
  * Pulls updates from the repository, records the update timestamp in the database, and triggers an application restart.
  *
- * Attempts a `git pull origin main`; regardless of pull success, it writes or updates the `last_update_at` key in the `system_info`
- * table with the current timestamp (if the database update fails it logs the error) and then invokes the restart procedure.
+ * Attempts a `git pull origin main`; if successful, it writes or updates the `last_update_at` key in the `system_info`
+ * table with the current timestamp and then invokes the restart procedure.
+ * If the pull fails, it records the failed SHA in the database and cancels the restart.
  */
 async function performUpdate() {
   console.log("Performing git pull from origin main...");
   exec("git pull origin main", async (err) => {
     if (err) {
       console.error("Git pull failed:", err);
-      // Proceeding with restart anyway as we are in an update cycle
+      if (pendingRemoteSha) {
+        try {
+          await pool.query(
+            "INSERT INTO system_info (key, value) VALUES ('failed_remote_sha', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
+            [pendingRemoteSha],
+          );
+        } catch (dbErr) {
+          console.error("Failed to store failed_remote_sha:", dbErr);
+        }
+      }
+      updatePending = false;
+      pendingRemoteSha = null;
+      return;
     }
+
+    // Update the version cache after a successful pull
+    refreshCurrentVersion();
 
     try {
       // Record the last update timestamp in the database
@@ -488,25 +532,36 @@ function triggerRestart() {
     }
   }
 
-  let child;
-  if (isWindows) {
-    // Use completely hardcoded strings for spawn to satisfy CodeQL
-    child = spawn("cmd.exe", ["/c", "restart.bat"], {
-      detached: true,
-      stdio: "ignore",
-      cwd: __dirname,
-    });
-  } else {
-    // Use completely hardcoded strings for spawn to satisfy CodeQL
-    child = spawn("/bin/bash", ["./restart.sh"], {
-      detached: true,
-      stdio: "ignore",
-      cwd: __dirname,
-    });
-  }
+  try {
+    let child;
+    if (isWindows) {
+      // Use completely hardcoded strings for spawn to satisfy CodeQL
+      child = spawn("cmd.exe", ["/c", "restart.bat"], {
+        detached: true,
+        stdio: "ignore",
+        cwd: __dirname,
+      });
+    } else {
+      // Use completely hardcoded strings for spawn to satisfy CodeQL
+      child = spawn("/bin/bash", ["./restart.sh"], {
+        detached: true,
+        stdio: "ignore",
+        cwd: __dirname,
+      });
+    }
 
-  child.unref();
-  process.exit(0);
+    if (child) {
+      child.on("error", (err) => {
+        console.error("Failed to start restart script:", err);
+        process.exit(1);
+      });
+      child.unref();
+      process.exit(0);
+    }
+  } catch (err) {
+    console.error("Error during spawn of restart script:", err);
+    process.exit(1);
+  }
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -521,6 +576,9 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function startServer() {
   const maxRetries = 10;
   const retryInterval = 2000; // 2 seconds
+
+  // Initialize the current version cache
+  refreshCurrentVersion();
 
   // Pre-calculate a dummy hash for timing attack mitigation
   // using the same cost factor (10) as the real password hashes.
