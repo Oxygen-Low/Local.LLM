@@ -1,12 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { API_BASE_URL } from './api-url.token';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])]
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        { provide: API_BASE_URL, useValue: 'http://localhost:3000/api' }
+      ]
     }).compileComponents();
   });
 

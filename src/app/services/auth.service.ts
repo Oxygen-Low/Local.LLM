@@ -1,8 +1,9 @@
-import { Injectable, signal, computed } from "@angular/core";
+import { Injectable, signal, computed, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { tap, catchError, map, switchMap } from "rxjs/operators";
 import { of, Observable } from "rxjs";
+import { API_BASE_URL } from "../api-url.token";
 
 export interface User {
   id: number;
@@ -14,7 +15,7 @@ export interface User {
   providedIn: "root",
 })
 export class AuthService {
-  private apiUrl = "http://localhost:3000/api";
+  private apiUrl = inject(API_BASE_URL);
   private currentUserSignal = signal<User | null>(null);
 
   currentUser = computed(() => this.currentUserSignal());
