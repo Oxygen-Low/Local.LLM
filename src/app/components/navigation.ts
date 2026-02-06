@@ -46,15 +46,6 @@ import { AuthService } from "../services/auth.service";
           >
             Settings
           </a>
-          @if (authService.isAdmin()) {
-            <a
-              routerLink="/admin"
-              routerLinkActive="text-white bg-gray-900"
-              class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
-            >
-              Admin
-            </a>
-          }
           @if (authService.isAuthenticated()) {
             <a
               routerLink="/changelogs"
@@ -62,6 +53,15 @@ import { AuthService } from "../services/auth.service";
               class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
             >
               Changelogs
+            </a>
+          }
+          @if (authService.isAdmin()) {
+            <a
+              routerLink="/admin"
+              routerLinkActive="text-white bg-gray-900"
+              class="text-gray-400 hover:text-white hover:bg-gray-900 block px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200"
+            >
+              Admin
             </a>
           }
         </div>
