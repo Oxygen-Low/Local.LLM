@@ -551,10 +551,6 @@ function triggerRestart() {
     }
 
     if (child) {
-      child.on("error", (err) => {
-        console.error("Failed to start restart script:", err);
-        process.exit(1);
-      });
       child.unref();
       process.exit(0);
     }
