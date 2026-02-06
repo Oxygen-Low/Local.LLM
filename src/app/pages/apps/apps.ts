@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core";
+import { Component, computed, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 
@@ -194,19 +194,20 @@ export class AppsListComponent {
     },
   ];
 
-  filteredApps = (() => {
+  filteredApps = computed(() => {
+    // Hoist toLowerCase() calls outside the loop for performance
+    const query = this.searchQuery().toLowerCase();
+    const category = this.selectedCategory();
+
     return this.apps.filter((app) => {
       const matchesSearch =
-        app.name.toLowerCase().includes(this.searchQuery().toLowerCase()) ||
-        app.description
-          .toLowerCase()
-          .includes(this.searchQuery().toLowerCase());
-      const matchesCategory =
-        !this.selectedCategory() || app.category === this.selectedCategory();
+        app.name.toLowerCase().includes(query) ||
+        app.description.toLowerCase().includes(query);
+      const matchesCategory = !category || app.category === category;
 
       return matchesSearch && matchesCategory;
     });
-  }).bind(this);
+  });
 
   getStatusBadgeClass(status: string): string {
     switch (status) {
