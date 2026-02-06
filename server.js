@@ -60,11 +60,12 @@ const AUTO_UPDATE_SHOW_CHANGELOGS =
   process.env.AUTO_UPDATE_SHOW_CHANGELOGS !== "false";
 
 // Extract and validate database environment variables
-const DB_USER = process.env.DB_USER;
-const DB_HOST = process.env.DB_HOST;
-const DB_NAME = process.env.DB_NAME;
-const DB_PASSWORD = process.env.DB_PASSWORD;
-const DB_PORT = process.env.DB_PORT;
+// We handle $$ as an escape for $ to maintain compatibility with Docker Compose
+const DB_USER = process.env.DB_USER?.replace(/\$\$/g, "$");
+const DB_HOST = process.env.DB_HOST?.replace(/\$\$/g, "$");
+const DB_NAME = process.env.DB_NAME?.replace(/\$\$/g, "$");
+const DB_PASSWORD = process.env.DB_PASSWORD?.replace(/\$\$/g, "$");
+const DB_PORT = process.env.DB_PORT?.replace(/\$\$/g, "$");
 
 if (!DB_USER || !DB_HOST || !DB_NAME || !DB_PASSWORD || !DB_PORT) {
   console.error(
@@ -79,7 +80,13 @@ if (
   SESSION_SECRET === "super-secret-key"
 ) {
   console.error(
-    "CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and not be a default value.",
+    `CRITICAL: SESSION_SECRET must be defined in environment variables, be at least 32 characters long, and not be a default value. (Current length: ${SESSION_SECRET ? SESSION_SECRET.length : 0})`,
+  );
+  console.error(
+    "HINT: If your secret contains '#' it must be wrapped in single quotes (e.g., SESSION_SECRET='abc#123').",
+  );
+  console.error(
+    "HINT: If your secret contains '$' and is used in Docker Compose, use '$$' to escape it.",
   );
   process.exit(1);
 }
