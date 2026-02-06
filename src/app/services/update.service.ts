@@ -1,7 +1,8 @@
-import { Injectable, signal, computed } from "@angular/core";
+import { Injectable, signal, computed, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { interval, of } from "rxjs";
 import { switchMap, catchError, map } from "rxjs/operators";
+import { API_BASE_URL } from "../api-url.token";
 
 export interface UpdateStatus {
   updatePending: boolean;
@@ -21,7 +22,7 @@ export interface Changelogs {
   providedIn: "root",
 })
 export class UpdateService {
-  private apiUrl = "http://localhost:3000/api";
+  private apiUrl = inject(API_BASE_URL);
 
   private statusSignal = signal<UpdateStatus | null>(null);
 
