@@ -4,6 +4,8 @@ const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { exec, spawn } = require("child_process");
+const util = require("util");
+const execPromise = util.promisify(exec);
 const fs = require("fs");
 const path = require("path");
 const session = require("express-session");
@@ -38,10 +40,9 @@ let currentVersionCache = "Unknown";
  */
 function refreshCurrentVersion() {
   try {
-    const changelogPath = path.join(__dirname, "changelogs.md");
-    if (fs.existsSync(changelogPath)) {
-      const content = fs.readFileSync(changelogPath, "utf8");
-      currentVersionCache = content.split("\n")[0].trim();
+    const versionPath = path.join(__dirname, "version.txt");
+    if (fs.existsSync(versionPath)) {
+      currentVersionCache = fs.readFileSync(versionPath, "utf8").trim();
     }
   } catch (err) {
     console.error("Error refreshing current version cache:", err);
@@ -442,6 +443,98 @@ app.get("/api/changelogs", apiLimiter, async (req, res) => {
 });
 
 /**
+ * Escapes HTML special characters in a string to prevent XSS.
+ * @param {string} unsafe The string to escape.
+ * @returns {string} The escaped string.
+ */
+function escapeHtml(unsafe) {
+  if (!unsafe) return "";
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
+ * Generates a Markdown/HTML changelog entry for a specific commit SHA.
+ * @param {string} sha The commit SHA.
+ * @returns {Promise<string>} The generated HTML string.
+ */
+async function generateChangelogEntry(sha) {
+  try {
+    const { stdout: commitInfo } = await execPromise(
+      `git show -s --format="%s%n%b" ${sha}`,
+    );
+    const lines = commitInfo.trim().split("\n");
+    const title = lines[0];
+    const description = lines.slice(1).join("\n").trim();
+
+    const { stdout: filesChanged } = await execPromise(
+      `git diff-tree --no-commit-id --name-only -r ${sha}`,
+    );
+    const files = filesChanged
+      .trim()
+      .split("\n")
+      .filter((f) => f);
+
+    let filesHtml = "";
+    for (const file of files) {
+      try {
+        // Get first 20 lines of diff for this file in this commit
+        const { stdout: diff } = await execPromise(
+          `git diff ${sha}^ ${sha} -- "${file}" | head -n 20`,
+        );
+
+        filesHtml += `
+      <details class="mt-1 ml-4">
+        <summary class="cursor-pointer text-xs text-gray-400 hover:text-gray-200">${escapeHtml(file)}</summary>
+        <pre class="text-[10px] bg-[#0d1117] p-2 rounded mt-1 overflow-x-auto text-gray-300 border border-gray-800">${escapeHtml(diff)}</pre>
+        <a href="https://github.com/Oxygen-Low/Local.LLM/commit/${sha}" target="_blank" class="text-[10px] text-blue-400 hover:underline ml-2">View full file change</a>
+      </details>`;
+      } catch (diffErr) {
+        // Fallback for new files or other diff issues
+        filesHtml += `
+      <details class="mt-1 ml-4">
+        <summary class="cursor-pointer text-xs text-gray-400 hover:text-gray-200">${escapeHtml(file)}</summary>
+        <p class="text-[10px] text-gray-500 mt-1">Diff unavailable for this file.</p>
+        <a href="https://github.com/Oxygen-Low/Local.LLM/commit/${sha}" target="_blank" class="text-[10px] text-blue-400 hover:underline ml-2">View file in commit</a>
+      </details>`;
+      }
+    }
+
+    const prMatch = title.match(/\(#(\d+)\)$/);
+    const prLink = prMatch
+      ? ` | <a href="https://github.com/Oxygen-Low/Local.LLM/pull/${prMatch[1]}" target="_blank" class="text-blue-400 hover:underline">PR #${prMatch[1]}</a>`
+      : "";
+
+    return `
+<div class="commit-entry mb-8 border-l-2 border-gray-800 pl-4 py-2">
+  <div class="flex items-center gap-2 mb-1">
+    <h3 class="text-lg font-semibold text-white">${escapeHtml(title)}</h3>
+  </div>
+  ${description ? `<p class="text-sm text-gray-400 mb-3 whitespace-pre-wrap">${escapeHtml(description)}</p>` : ""}
+  <div class="flex items-center gap-3 text-xs mb-3">
+    <a href="https://github.com/Oxygen-Low/Local.LLM/commit/${sha}" target="_blank" class="bg-gray-800 text-gray-300 px-2 py-1 rounded hover:bg-gray-700 transition-colors">
+      ${sha.substring(0, 7)}
+    </a>
+    ${prLink}
+  </div>
+  <details class="mt-2">
+    <summary class="cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-300 transition-colors">Files changed (${files.length})</summary>
+    <div class="mt-2">
+      ${filesHtml}
+    </div>
+  </details>
+</div>`;
+  } catch (err) {
+    console.error(`Error generating changelog entry for ${sha}:`, err);
+    return "";
+  }
+}
+
+/**
  * Check the remote Git repository for a newer commit and, if found, schedule applying the update.
  *
  * If AUTO_UPDATE is disabled or an update is already pending, this function returns without action.
@@ -499,12 +592,19 @@ async function checkForUpdates() {
           pendingRemoteSha = remote;
           restartAt = Date.now() + AUTO_UPDATE_WAIT * 1000;
 
-          // Attempt to get the new version from the remote changelogs.md
-          exec("git show origin/main:changelogs.md", (err, stdoutChangelog) => {
+          // Attempt to get the new version from the remote version.txt
+          exec("git show origin/main:version.txt", (err, stdoutVersion) => {
             if (!err) {
-              updateVersion = stdoutChangelog.split("\n")[0].trim();
+              updateVersion = stdoutVersion.trim();
             } else {
-              updateVersion = "Unknown";
+              // Fallback for transition period
+              exec("git show origin/main:changelogs.md", (err2, stdoutCh) => {
+                if (!err2) {
+                  updateVersion = stdoutCh.split("\n")[0].trim();
+                } else {
+                  updateVersion = "Unknown";
+                }
+              });
             }
             console.log(`Update Version: ${updateVersion}`);
           });
@@ -524,6 +624,15 @@ async function checkForUpdates() {
  */
 async function performUpdate() {
   console.log("Performing git pull from origin main...");
+
+  let origHead = "HEAD";
+  try {
+    const { stdout } = await execPromise("git rev-parse HEAD");
+    origHead = stdout.trim();
+  } catch (err) {
+    console.error("Failed to get ORIG_HEAD:", err);
+  }
+
   exec("git pull origin main", async (err) => {
     if (err) {
       console.error("Git pull failed:", err);
@@ -540,6 +649,37 @@ async function performUpdate() {
       updatePending = false;
       pendingRemoteSha = null;
       return;
+    }
+
+    // Handle changelog generation
+    try {
+      const { stdout: diffFiles } = await execPromise(
+        `git diff --name-only ${origHead} HEAD`,
+      );
+      const files = diffFiles.split("\n");
+      const versionChanged = files.includes("version.txt");
+
+      const changelogPath = path.join(__dirname, "changelogs.md");
+      if (versionChanged) {
+        fs.writeFileSync(changelogPath, "");
+      }
+
+      const { stdout: commits } = await execPromise(
+        `git log ${origHead}..HEAD --reverse --pretty=format:%H`,
+      );
+      const shas = commits
+        .trim()
+        .split("\n")
+        .filter((s) => s);
+
+      for (const sha of shas) {
+        const entry = await generateChangelogEntry(sha);
+        if (entry) {
+          fs.appendFileSync(changelogPath, entry + "\n");
+        }
+      }
+    } catch (changelogErr) {
+      console.error("Error generating changelogs during update:", changelogErr);
     }
 
     // Update the version cache after a successful pull
