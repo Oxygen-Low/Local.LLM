@@ -589,23 +589,25 @@ function triggerRestart() {
   try {
     let child;
     if (isWindows) {
-      // Use completely hardcoded strings for spawn to satisfy CodeQL
-      child = spawn("cmd.exe", ["/c", "restart.bat"], {
-        detached: true,
-        stdio: "ignore",
+      // Use start /b to run in the same terminal but survive the parent.
+      // We avoid 'detached: true' because it opens a new window on Windows.
+      child = spawn("cmd.exe", ["/c", "start /b restart.bat"], {
+        stdio: "inherit",
         cwd: __dirname,
       });
     } else {
-      // Use completely hardcoded strings for spawn to satisfy CodeQL
+      // Use detached: true and stdio: inherit to stay in the same terminal.
       child = spawn("/bin/bash", ["./restart.sh"], {
         detached: true,
-        stdio: "ignore",
+        stdio: "inherit",
         cwd: __dirname,
       });
     }
 
     if (child) {
-      child.unref();
+      if (!isWindows) {
+        child.unref();
+      }
       process.exit(0);
     }
   } catch (err) {
