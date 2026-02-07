@@ -1,10 +1,11 @@
-import { Component, signal, OnInit, HostListener } from "@angular/core";
+import { Component, signal, OnInit, HostListener, ChangeDetectionStrategy } from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-navigation",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, RouterLinkActive],
   template: `
     <nav

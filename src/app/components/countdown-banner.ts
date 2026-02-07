@@ -1,9 +1,10 @@
-import { Component } from "@angular/core";
+import { Component, ChangeDetectionStrategy } from "@angular/core";
 import { UpdateService } from "../services/update.service";
 
 @Component({
   selector: "app-countdown-banner",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (updateService.updatePending()) {
       <div
