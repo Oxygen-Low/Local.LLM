@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const { exec, spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -19,6 +20,7 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PRODUCTION = NODE_ENV === "production";
 const PORT = process.env.PORT || 3000;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Auto-update state
 let updatePending = false;
@@ -202,6 +204,46 @@ async function initDb() {
       value TEXT
     )
   `);
+}
+
+/**
+ * Checks if the configured ADMIN_USERNAME exists in the database.
+ * If not, it creates the user with a random password (or ADMIN_PASSWORD if set)
+ * and logs the credentials to the console.
+ */
+async function seedAdmin() {
+  if (!ADMIN_USERNAME) return;
+
+  try {
+    const res = await pool.query("SELECT * FROM users WHERE username = $1", [
+      ADMIN_USERNAME,
+    ]);
+    if (res.rows.length === 0) {
+      const password =
+        ADMIN_PASSWORD || crypto.randomBytes(16).toString("hex");
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await pool.query(
+        "INSERT INTO users (username, password) VALUES ($1, $2)",
+        [ADMIN_USERNAME, hashedPassword],
+      );
+      console.log(`\n=== ADMIN ACCOUNT CREATED ===`);
+      console.log(`Username: ${ADMIN_USERNAME}`);
+      if (!ADMIN_PASSWORD) {
+        console.log(`Password: ${password}`);
+        // SECURITY WARNING: This password is logged to stdout.
+        // In a production environment with persistent logging, this may be a risk.
+        // It is recommended to use the ADMIN_PASSWORD environment variable instead.
+        console.log(`PLEASE SAVE THIS PASSWORD NOW.`);
+      } else {
+        console.log(`Password: (provided in env)`);
+      }
+      console.log(`=============================\n`);
+    } else {
+      console.log(`Admin account '${ADMIN_USERNAME}' already exists.`);
+    }
+  } catch (err) {
+    console.error("Error seeding admin account:", err);
+  }
 }
 
 // Routes
@@ -597,6 +639,7 @@ async function startServer() {
   for (let i = 0; i < maxRetries; i++) {
     try {
       await initDb();
+      await seedAdmin();
       app.listen(PORT, () => {
         console.log(`Server running at http://localhost:${PORT}`);
 
