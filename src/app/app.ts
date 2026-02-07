@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, OnInit, signal, ChangeDetectionStrategy } from "@angular/core";
 import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { NavigationComponent } from "./components/navigation";
 import { CountdownBannerComponent } from "./components/countdown-banner";
@@ -9,6 +9,7 @@ import { filter } from "rxjs/operators";
 @Component({
   selector: "app-root",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterOutlet,
     NavigationComponent,

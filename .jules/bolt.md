@@ -1,0 +1,3 @@
+## 2024-02-07 - [Angular Signals and OnPush Strategy]
+**Learning:** Angular Signals work seamlessly with `ChangeDetectionStrategy.OnPush`. Components using Signals in their templates (like `showNavigation()`) are automatically marked for check when the signal updates, making `OnPush` the default best practice for Signal-based components. This allows skipping the component tree check for events that don't affect the specific component, significantly reducing CPU usage during idle or unrelated interactions.
+**Action:** Always enable `ChangeDetectionStrategy.OnPush` when using Angular Signals for state management in components.

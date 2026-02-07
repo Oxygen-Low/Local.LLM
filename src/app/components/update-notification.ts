@@ -1,4 +1,4 @@
-import { Component, signal, computed } from "@angular/core";
+import { Component, signal, computed, ChangeDetectionStrategy } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { UpdateService } from "../services/update.service";
 import { AuthService } from "../services/auth.service";
@@ -6,6 +6,7 @@ import { AuthService } from "../services/auth.service";
 @Component({
   selector: "app-update-notification",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
   template: `
     @if (showNotification() && authService.isAuthenticated()) {
