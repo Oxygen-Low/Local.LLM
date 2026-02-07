@@ -208,8 +208,7 @@ async function initDb() {
 
 /**
  * Checks if the configured ADMIN_USERNAME exists in the database.
- * If not, it creates the user with a random password (or ADMIN_PASSWORD if set)
- * and logs the credentials to the console.
+ * If not, and if ADMIN_PASSWORD is provided, it creates the admin user.
  */
 async function seedAdmin() {
   if (!ADMIN_USERNAME) return;
@@ -219,25 +218,18 @@ async function seedAdmin() {
       ADMIN_USERNAME,
     ]);
     if (res.rows.length === 0) {
-      const password =
-        ADMIN_PASSWORD || crypto.randomBytes(16).toString("hex");
-      const hashedPassword = await bcrypt.hash(password, 10);
-      await pool.query(
-        "INSERT INTO users (username, password) VALUES ($1, $2)",
-        [ADMIN_USERNAME, hashedPassword],
-      );
-      console.log(`\n=== ADMIN ACCOUNT CREATED ===`);
-      console.log(`Username: ${ADMIN_USERNAME}`);
-      if (!ADMIN_PASSWORD) {
-        console.log(`Password: ${password}`);
-        // SECURITY WARNING: This password is logged to stdout.
-        // In a production environment with persistent logging, this may be a risk.
-        // It is recommended to use the ADMIN_PASSWORD environment variable instead.
-        console.log(`PLEASE SAVE THIS PASSWORD NOW.`);
+      if (ADMIN_PASSWORD) {
+        const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+        await pool.query(
+          "INSERT INTO users (username, password) VALUES ($1, $2)",
+          [ADMIN_USERNAME, hashedPassword],
+        );
+        console.log(`Admin account '${ADMIN_USERNAME}' created using ADMIN_PASSWORD.`);
       } else {
-        console.log(`Password: (provided in env)`);
+        console.log(
+          `NOTICE: ADMIN_USERNAME is set to '${ADMIN_USERNAME}' but ADMIN_PASSWORD is not set. Admin account was NOT seeded. Public registration for this username is blocked.`,
+        );
       }
-      console.log(`=============================\n`);
     } else {
       console.log(`Admin account '${ADMIN_USERNAME}' already exists.`);
     }
@@ -260,6 +252,13 @@ app.post("/api/register", authLimiter, async (req, res) => {
     return res.status(400).json({
       error:
         "Username must be 3-20 characters long and contain only letters, numbers, underscores, and hyphens",
+    });
+  }
+
+  // Prevent public registration of the admin username to avoid takeover
+  if (ADMIN_USERNAME && username === ADMIN_USERNAME) {
+    return res.status(403).json({
+      error: "This username is reserved and cannot be registered publicly.",
     });
   }
 
