@@ -224,14 +224,14 @@ async function seedAdmin() {
           "INSERT INTO users (username, password) VALUES ($1, $2)",
           [ADMIN_USERNAME, hashedPassword],
         );
-        console.log(`Admin account '${ADMIN_USERNAME}' created using ADMIN_PASSWORD.`);
+        console.log("Admin account created using ADMIN_PASSWORD.");
       } else {
         console.log(
-          `NOTICE: ADMIN_USERNAME is set to '${ADMIN_USERNAME}' but ADMIN_PASSWORD is not set. Admin account was NOT seeded. Public registration for this username is blocked.`,
+          "NOTICE: ADMIN_USERNAME is set but ADMIN_PASSWORD is not set. Admin account was NOT seeded. Public registration for this username is blocked.",
         );
       }
     } else {
-      console.log(`Admin account '${ADMIN_USERNAME}' already exists.`);
+      console.log("Admin account already exists.");
     }
   } catch (err) {
     console.error("Error seeding admin account:", err);
