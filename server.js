@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const { exec, spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -19,6 +20,7 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PRODUCTION = NODE_ENV === "production";
 const PORT = process.env.PORT || 3000;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Auto-update state
 let updatePending = false;
@@ -204,6 +206,38 @@ async function initDb() {
   `);
 }
 
+/**
+ * Checks if the configured ADMIN_USERNAME exists in the database.
+ * If not, and if ADMIN_PASSWORD is provided, it creates the admin user.
+ */
+async function seedAdmin() {
+  if (!ADMIN_USERNAME) return;
+
+  try {
+    const res = await pool.query("SELECT * FROM users WHERE username = $1", [
+      ADMIN_USERNAME,
+    ]);
+    if (res.rows.length === 0) {
+      if (ADMIN_PASSWORD) {
+        const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+        await pool.query(
+          "INSERT INTO users (username, password) VALUES ($1, $2)",
+          [ADMIN_USERNAME, hashedPassword],
+        );
+        console.log("Admin account created using ADMIN_PASSWORD.");
+      } else {
+        console.log(
+          "NOTICE: ADMIN_USERNAME is set but ADMIN_PASSWORD is not set. Admin account was NOT seeded. Public registration for this username is blocked.",
+        );
+      }
+    } else {
+      console.log("Admin account already exists.");
+    }
+  } catch (err) {
+    console.error("Error seeding admin account:", err);
+  }
+}
+
 // Routes
 app.post("/api/register", authLimiter, async (req, res) => {
   const { username, password } = req.body;
@@ -218,6 +252,13 @@ app.post("/api/register", authLimiter, async (req, res) => {
     return res.status(400).json({
       error:
         "Username must be 3-20 characters long and contain only letters, numbers, underscores, and hyphens",
+    });
+  }
+
+  // Prevent public registration of the admin username to avoid takeover
+  if (ADMIN_USERNAME && username === ADMIN_USERNAME) {
+    return res.status(403).json({
+      error: "This username is reserved and cannot be registered publicly.",
     });
   }
 
@@ -597,6 +638,7 @@ async function startServer() {
   for (let i = 0; i < maxRetries; i++) {
     try {
       await initDb();
+      await seedAdmin();
       app.listen(PORT, () => {
         console.log(`Server running at http://localhost:${PORT}`);
 
