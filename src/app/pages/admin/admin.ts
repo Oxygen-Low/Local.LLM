@@ -5,7 +5,7 @@ import { AuthService } from "../../services/auth.service";
   selector: "app-admin",
   standalone: true,
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-gray-900 to-black p-8">
+    <div class="min-h-screen p-8" style="background-color: #282828;">
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
