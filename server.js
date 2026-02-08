@@ -143,6 +143,7 @@ const apiLimiter = rateLimit({
 // Session configuration
 app.use(
   session({
+    name: "local_llm_sid", // Use custom name to prevent fingerprinting
     store: new PgSession({
       pool: pool,
       tableName: "session",
@@ -151,6 +152,8 @@ app.use(
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    unset: "destroy", // Ensure session is removed from store when unset
+    proxy: IS_PRODUCTION, // Trust reverse proxy in production for secure cookies
     rolling: true, // Refresh cookie on every request
     cookie: {
       maxAge: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
@@ -345,7 +348,7 @@ app.post("/api/login", authLimiter, async (req, res) => {
   }
 });
 
-app.post("/api/logout", (req, res) => {
+app.post("/api/logout", authLimiter, (req, res) => {
   req.session.regenerate((err) => {
     if (err) {
       return res.status(500).json({ error: "Could not log out" });
