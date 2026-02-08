@@ -99,6 +99,7 @@ import { AuthService } from "../services/auth.service";
           <div
             (click)="userMenuOpen.set(false)"
             class="fixed inset-0 z-10 cursor-default"
+            aria-hidden="true"
           ></div>
           <div
             class="absolute bottom-full left-4 w-56 mb-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden z-20"
@@ -204,6 +205,11 @@ export class NavigationComponent implements OnInit {
   @HostListener("window:resize", ["$event"])
   onResize(event: any) {
     this.updateIsMobile();
+  }
+
+  @HostListener("document:keydown.escape")
+  onEscape() {
+    this.userMenuOpen.set(false);
   }
 
   private updateIsMobile() {
