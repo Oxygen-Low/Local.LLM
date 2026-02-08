@@ -148,6 +148,14 @@ if (IS_PRODUCTION) {
 }
 
 app.use(helmet());
+// Add Permissions-Policy header to disable unused features for security
+app.use((req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=()",
+  );
+  next();
+});
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 app.use(
