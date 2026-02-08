@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core";
+import { Component, signal, computed, ChangeDetectionStrategy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 
@@ -22,6 +22,9 @@ interface FriendRequest {
 @Component({
   selector: "app-friends-list",
   standalone: true,
+  // Optimization: Use OnPush strategy to minimize change detection cycles.
+  // The component will only update when its Inputs change or Signals update.
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
     <div
@@ -56,10 +59,10 @@ interface FriendRequest {
         <!-- Friend Requests Section -->
         <div class="mb-12">
           <h2 class="text-2xl font-bold text-gray-100 mb-6">
-            Friend Requests ({{ friendRequests.length }})
+            Friend Requests ({{ friendRequests().length }})
           </h2>
 
-          @if (friendRequests.length === 0) {
+          @if (friendRequests().length === 0) {
             <div class="card p-8 text-center">
               <div class="text-4xl mb-3">📬</div>
               <p class="text-gray-400">No pending friend requests</p>
@@ -174,10 +177,10 @@ interface FriendRequest {
         <!-- Friends List Section -->
         <div>
           <h2 class="text-2xl font-bold text-gray-100 mb-6">
-            Friends ({{ friends.length }})
+            Friends ({{ friends().length }})
           </h2>
 
-          @if (friends.length === 0) {
+          @if (friends().length === 0) {
             <div class="card p-8 text-center">
               <div class="text-4xl mb-3">👥</div>
               <p class="text-gray-400">You haven't added any friends yet</p>
@@ -190,11 +193,11 @@ interface FriendRequest {
             </div>
           }
 
-          @if (friends.length > 0) {
+          @if (friends().length > 0) {
             <div
               class="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
-              @for (friend of friends; track friend) {
+              @for (friend of friends(); track friend) {
                 <div
                   class="card p-6 card-hover flex items-center justify-between"
                   >
@@ -298,10 +301,12 @@ interface FriendRequest {
     `,
 })
 export class FriendsListComponent {
+  // Optimization: Use Signals for reactive state management.
+  // This enables fine-grained reactivity and efficient updates.
   showAddFriendModal = signal(false);
   searchUsername = signal("");
 
-  friends: Friend[] = [
+  friends = signal<Friend[]>([
     {
       id: "1",
       username: "alex_dev",
@@ -326,9 +331,9 @@ export class FriendsListComponent {
       lastSeen: "2 hours ago",
       addedDate: "2024-01-10",
     },
-  ];
+  ]);
 
-  friendRequests: FriendRequest[] = [
+  friendRequests = signal<FriendRequest[]>([
     {
       id: "1",
       username: "tech_lover",
@@ -343,49 +348,55 @@ export class FriendsListComponent {
       timestamp: "2 days ago",
       type: "outgoing",
     },
-  ];
+  ]);
 
-  incomingRequests() {
-    return this.friendRequests.filter((r) => r.type === "incoming");
-  }
+  // Optimization: Use computed signals to memoize derived values.
+  // These are only recalculated when the dependent signals (friendRequests) change,
+  // preventing unnecessary array filtering on every change detection cycle.
+  incomingRequests = computed(() => {
+    return this.friendRequests().filter((r) => r.type === "incoming");
+  });
 
-  outgoingRequests() {
-    return this.friendRequests.filter((r) => r.type === "outgoing");
-  }
+  outgoingRequests = computed(() => {
+    return this.friendRequests().filter((r) => r.type === "outgoing");
+  });
 
-  searchResults() {
+  searchResults = computed(() => {
     if (!this.searchUsername()) return [];
     const query = this.searchUsername().toLowerCase();
     return ["john_smith", "maria_garcia", "david_chen"].filter((u) =>
       u.includes(query),
     );
-  }
+  });
 
   acceptRequest(id: string): void {
-    const request = this.friendRequests.find((r) => r.id === id);
+    const request = this.friendRequests().find((r) => r.id === id);
     if (request) {
-      this.friends.push({
-        id: `f-${id}`,
-        username: request.username,
-        avatar: request.avatar,
-        status: "offline",
-        lastSeen: "just now",
-        addedDate: new Date().toISOString().split("T")[0],
-      });
-      this.friendRequests = this.friendRequests.filter((r) => r.id !== id);
+      this.friends.update(current => [
+        ...current,
+        {
+          id: `f-${id}`,
+          username: request.username,
+          avatar: request.avatar,
+          status: "offline",
+          lastSeen: "just now",
+          addedDate: new Date().toISOString().split("T")[0],
+        }
+      ]);
+      this.friendRequests.update(current => current.filter((r) => r.id !== id));
     }
   }
 
   declineRequest(id: string): void {
-    this.friendRequests = this.friendRequests.filter((r) => r.id !== id);
+    this.friendRequests.update(current => current.filter((r) => r.id !== id));
   }
 
   cancelRequest(id: string): void {
-    this.friendRequests = this.friendRequests.filter((r) => r.id !== id);
+    this.friendRequests.update(current => current.filter((r) => r.id !== id));
   }
 
   removeFriend(id: string): void {
-    this.friends = this.friends.filter((f) => f.id !== id);
+    this.friends.update(current => current.filter((f) => f.id !== id));
   }
 
   sendFriendRequest(username: string): void {
@@ -396,7 +407,7 @@ export class FriendsListComponent {
       timestamp: "just now",
       type: "outgoing",
     };
-    this.friendRequests.push(request);
+    this.friendRequests.update(current => [...current, request]);
     this.searchUsername.set("");
   }
 
