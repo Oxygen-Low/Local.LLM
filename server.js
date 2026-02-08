@@ -31,22 +31,54 @@ let restartAt = null;
 let updateVersion = null;
 let pendingRemoteSha = null;
 let currentVersionCache = "Unknown";
+let changelogsCache = "";
+let lastUpdateAtCache = null;
 
 /**
- * Update the module-level cached current version from the changelogs.md file.
+ * Update the module-level cached current version from the version.txt file.
  *
- * If changelogs.md exists, reads its first line, trims it, and stores it in
- * `currentVersionCache`. On any filesystem error the cache is left unchanged
- * and an error is logged to the console.
+ * Reads version.txt, trims it, and stores it in `currentVersionCache`.
+ * On any filesystem error the cache is left unchanged and an error is logged.
  */
-function refreshCurrentVersion() {
+async function refreshCurrentVersion() {
   try {
     const versionPath = path.join(__dirname, "version.txt");
-    if (fs.existsSync(versionPath)) {
-      currentVersionCache = fs.readFileSync(versionPath, "utf8").trim();
-    }
+    const data = await fs.promises.readFile(versionPath, "utf8");
+    currentVersionCache = data.trim();
   } catch (err) {
-    console.error("Error refreshing current version cache:", err);
+    if (err.code !== "ENOENT") {
+      console.error("Error refreshing current version cache:", err);
+    }
+  }
+}
+
+/**
+ * Update the module-level cached changelogs from the changelogs.md file.
+ */
+async function refreshChangelogsCache() {
+  try {
+    const changelogPath = path.join(__dirname, "changelogs.md");
+    changelogsCache = await fs.promises.readFile(changelogPath, "utf8");
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      changelogsCache = "";
+    } else {
+      console.error("Error refreshing changelogs cache:", err);
+    }
+  }
+}
+
+/**
+ * Update the module-level cached last update timestamp from the database.
+ */
+async function refreshLastUpdateAtCache() {
+  try {
+    const lastUpdateResult = await pool.query(
+      "SELECT value FROM system_info WHERE key = 'last_update_at'",
+    );
+    lastUpdateAtCache = lastUpdateResult.rows[0]?.value || null;
+  } catch (err) {
+    console.error("Error refreshing last update at cache:", err);
   }
 }
 
@@ -387,23 +419,12 @@ app.get("/api/update-status", apiLimiter, async (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  let lastUpdateAt = null;
-
-  try {
-    const lastUpdateResult = await pool.query(
-      "SELECT value FROM system_info WHERE key = 'last_update_at'",
-    );
-    lastUpdateAt = lastUpdateResult.rows[0]?.value || null;
-  } catch (err) {
-    console.error("Error fetching update status details:", err);
-  }
-
   res.json({
     updatePending,
     restartAt,
     updateVersion, // This is the version of the PENDING update
     currentVersion: currentVersionCache, // This is the version currently installed (cached)
-    lastUpdateAt,
+    lastUpdateAt: lastUpdateAtCache,
     autoUpdateShowChangelogs: AUTO_UPDATE_SHOW_CHANGELOGS,
   });
 });
@@ -424,26 +445,10 @@ app.get("/api/changelogs", apiLimiter, async (req, res) => {
     return res.status(403).json({ error: "Access denied" });
   }
 
-  try {
-    const changelogPath = path.join(__dirname, "changelogs.md");
-    let content = "";
-    if (fs.existsSync(changelogPath)) {
-      content = fs.readFileSync(changelogPath, "utf8");
-    }
-
-    const lastUpdateResult = await pool.query(
-      "SELECT value FROM system_info WHERE key = 'last_update_at'",
-    );
-    const lastUpdateAt = lastUpdateResult.rows[0]?.value || null;
-
-    res.json({
-      content,
-      lastUpdateAt,
-    });
-  } catch (err) {
-    console.error("Error reading changelogs:", err);
-    res.status(500).json({ error: "Could not read changelogs" });
-  }
+  res.json({
+    content: changelogsCache,
+    lastUpdateAt: lastUpdateAtCache,
+  });
 });
 
 /**
@@ -659,6 +664,9 @@ async function performUpdate() {
   try {
     await execFilePromise("git", ["pull", "origin", "main"]);
 
+    // Update the version cache after a successful pull
+    await refreshCurrentVersion();
+
     // Handle changelog generation
     try {
       const { stdout: diffFiles } = await execFilePromise("git", [
@@ -671,9 +679,6 @@ async function performUpdate() {
       const versionChanged = files.includes("version.txt");
 
       const changelogPath = path.join(__dirname, "changelogs.md");
-      if (versionChanged) {
-        fs.writeFileSync(changelogPath, "");
-      }
 
       const { stdout: commits } = await execFilePromise("git", [
         "log",
@@ -686,18 +691,25 @@ async function performUpdate() {
         .split("\n")
         .filter((s) => s);
 
+      const entries = [];
       for (const sha of shas) {
         const entry = await generateChangelogEntry(sha);
         if (entry) {
-          fs.appendFileSync(changelogPath, entry + "\n");
+          entries.push(entry);
         }
       }
+
+      if (versionChanged) {
+        await fs.promises.writeFile(changelogPath, entries.join("\n") + "\n");
+      } else if (entries.length > 0) {
+        await fs.promises.appendFile(changelogPath, entries.join("\n") + "\n");
+      }
+
+      // Update the changelog cache after writing
+      await refreshChangelogsCache();
     } catch (changelogErr) {
       console.error("Error generating changelogs during update:", changelogErr);
     }
-
-    // Update the version cache after a successful pull
-    refreshCurrentVersion();
 
     try {
       // Record the last update timestamp in the database
@@ -706,6 +718,8 @@ async function performUpdate() {
         "INSERT INTO system_info (key, value) VALUES ('last_update_at', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
         [now],
       );
+      // Update the last update cache
+      await refreshLastUpdateAtCache();
     } catch (dbErr) {
       console.error("Failed to update last_update_at in database:", dbErr);
     }
@@ -798,9 +812,6 @@ async function startServer() {
   const maxRetries = 10;
   const retryInterval = 2000; // 2 seconds
 
-  // Initialize the current version cache
-  refreshCurrentVersion();
-
   // Pre-calculate a dummy hash for timing attack mitigation
   // using the same cost factor (10) as the real password hashes.
   dummyHash = await bcrypt.hash("dummy_password_for_timing_mitigation", 10);
@@ -808,6 +819,12 @@ async function startServer() {
   for (let i = 0; i < maxRetries; i++) {
     try {
       await initDb();
+      // Initialize caches after DB is ready
+      await Promise.all([
+        refreshCurrentVersion(),
+        refreshChangelogsCache(),
+        refreshLastUpdateAtCache(),
+      ]);
       await seedAdmin();
       app.listen(PORT, () => {
         console.log(`Server running at http://localhost:${PORT}`);

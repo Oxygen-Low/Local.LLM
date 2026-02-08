@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from "@angular/core";
+import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from "@angular/core";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { UpdateService } from "../../services/update.service";
 import { Router } from "@angular/router";
@@ -6,6 +6,7 @@ import { Router } from "@angular/router";
 @Component({
   selector: "app-changelogs",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="container mx-auto px-6 py-8">
       <div class="max-w-4xl mx-auto">
