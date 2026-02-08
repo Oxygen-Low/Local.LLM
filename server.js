@@ -116,7 +116,7 @@ if (IS_PRODUCTION) {
 }
 
 app.use(helmet());
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 app.use(
   cors({
@@ -148,6 +148,7 @@ app.use(
       pool: pool,
       tableName: "session",
       createTableIfMissing: true,
+      pruneSessionInterval: 60, // Prune expired sessions every 60 seconds
     }),
     secret: SESSION_SECRET,
     resave: false,
@@ -252,6 +253,12 @@ app.post("/api/register", authLimiter, async (req, res) => {
     return res.status(400).json({ error: "Username and password required" });
   }
 
+  if (typeof username !== "string" || typeof password !== "string") {
+    return res
+      .status(400)
+      .json({ error: "Username and password must be strings" });
+  }
+
   const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
   if (!usernameRegex.test(username)) {
     return res.status(400).json({
@@ -310,6 +317,12 @@ app.post("/api/login", authLimiter, async (req, res) => {
 
   if (!username || !password) {
     return res.status(400).json({ error: "Username and password required" });
+  }
+
+  if (typeof username !== "string" || typeof password !== "string") {
+    return res
+      .status(400)
+      .json({ error: "Username and password must be strings" });
   }
 
   if (password.length > 128) {
