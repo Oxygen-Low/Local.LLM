@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, OnInit, signal, inject } from "@angular/core";
+import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { UpdateService } from "../../services/update.service";
 import { Router } from "@angular/router";
-import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: "app-changelogs",
@@ -21,30 +21,24 @@ import { AuthService } from "../../services/auth.service";
 
         <div
           class="prose prose-invert prose-yellow max-w-none bg-[#1e1e1e] p-8 rounded-xl border border-gray-800 shadow-2xl"
-        >
-          <pre
-            class="whitespace-pre-wrap font-sans text-gray-300 border-none p-0 bg-transparent"
-            >{{ content() }}</pre
-          >
-        </div>
+          [innerHTML]="content()"
+        ></div>
       </div>
     </div>
   `,
 })
 export class ChangelogsComponent implements OnInit {
-  content = signal<string>("");
+  content = signal<SafeHtml>("");
   error = signal<string | null>(null);
 
-  constructor(
-    private updateService: UpdateService,
-    private authService: AuthService,
-    private router: Router,
-  ) {}
+  private sanitizer = inject(DomSanitizer);
+  private updateService = inject(UpdateService);
+  private router = inject(Router);
 
   ngOnInit() {
     this.updateService.getChangelogs().subscribe({
       next: (data) => {
-        this.content.set(data.content);
+        this.content.set(this.sanitizer.bypassSecurityTrustHtml(data.content));
       },
       error: (err: any) => {
         if (err.status === 403) {
