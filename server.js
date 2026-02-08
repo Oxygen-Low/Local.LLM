@@ -21,6 +21,10 @@ const lusca = require("lusca");
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PRODUCTION = NODE_ENV === "production";
+const SHOULD_TRUST_PROXY =
+  IS_PRODUCTION ||
+  process.env.CODESPACES === "true" ||
+  process.env.TRUST_PROXY === "true";
 const PORT = process.env.PORT || 3000;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -141,8 +145,8 @@ const pool = new Pool({
 });
 
 // Middleware
-if (IS_PRODUCTION) {
-  // Trust the first proxy (e.g. Cloudflare, Nginx, Heroku router)
+if (SHOULD_TRUST_PROXY) {
+  // Trust the first proxy (e.g. Cloudflare, Nginx, Heroku router, GitHub Codespaces)
   // Essential for correct IP detection in rate limiting and secure cookies
   app.set("trust proxy", 1);
 }
@@ -194,7 +198,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     unset: "destroy", // Ensure session is removed from store when unset
-    proxy: IS_PRODUCTION, // Trust reverse proxy in production for secure cookies
+    proxy: SHOULD_TRUST_PROXY, // Trust reverse proxy for secure cookies
     rolling: true, // Refresh cookie on every request
     cookie: {
       maxAge: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
