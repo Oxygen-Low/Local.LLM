@@ -108,13 +108,6 @@ import { AuthService } from "../services/auth.service";
                 {{ authService.currentUser()?.username }}
               </p>
             </div>
-            <a
-              routerLink="/settings"
-              (click)="userMenuOpen.set(false)"
-              class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-            >
-              Settings
-            </a>
             <button
               (click)="logout()"
               class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors flex items-center gap-2"
