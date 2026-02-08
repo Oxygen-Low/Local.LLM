@@ -3,9 +3,10 @@ const express = require("express");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const { exec, spawn } = require("child_process");
+const { exec, execFile, spawn } = require("child_process");
 const util = require("util");
 const execPromise = util.promisify(exec);
+const execFilePromise = util.promisify(execFile);
 const fs = require("fs");
 const path = require("path");
 const session = require("express-session");
@@ -463,17 +464,30 @@ function escapeHtml(unsafe) {
  * @returns {Promise<string>} The generated HTML string.
  */
 async function generateChangelogEntry(sha) {
+  // Validate SHA to prevent command injection
+  if (!/^[a-f0-9]+$/i.test(sha)) {
+    console.error(`Invalid commit SHA: ${sha}`);
+    return "";
+  }
+
   try {
-    const { stdout: commitInfo } = await execPromise(
-      `git show -s --format="%s%n%b" ${sha}`,
-    );
+    const { stdout: commitInfo } = await execFilePromise("git", [
+      "show",
+      "-s",
+      "--format=%s%n%b",
+      sha,
+    ]);
     const lines = commitInfo.trim().split("\n");
     const title = lines[0];
     const description = lines.slice(1).join("\n").trim();
 
-    const { stdout: filesChanged } = await execPromise(
-      `git diff-tree --no-commit-id --name-only -r ${sha}`,
-    );
+    const { stdout: filesChanged } = await execFilePromise("git", [
+      "diff-tree",
+      "--no-commit-id",
+      "--name-only",
+      "-r",
+      sha,
+    ]);
     const files = filesChanged
       .trim()
       .split("\n")
@@ -482,15 +496,21 @@ async function generateChangelogEntry(sha) {
     let filesHtml = "";
     for (const file of files) {
       try {
-        // Get first 20 lines of diff for this file in this commit
-        const { stdout: diff } = await execPromise(
-          `git diff ${sha}^ ${sha} -- "${file}" | head -n 20`,
-        );
+        // Get diff for this file in this commit and truncate in JS
+        const { stdout: diff } = await execFilePromise("git", [
+          "diff",
+          `${sha}^`,
+          sha,
+          "--",
+          file,
+        ]);
+
+        const truncatedDiff = diff.split("\n").slice(0, 20).join("\n");
 
         filesHtml += `
       <details class="mt-1 ml-4">
         <summary class="cursor-pointer text-xs text-gray-400 hover:text-gray-200">${escapeHtml(file)}</summary>
-        <pre class="text-[10px] bg-[#0d1117] p-2 rounded mt-1 overflow-x-auto text-gray-300 border border-gray-800">${escapeHtml(diff)}</pre>
+        <pre class="text-[10px] bg-[#0d1117] p-2 rounded mt-1 overflow-x-auto text-gray-300 border border-gray-800">${escapeHtml(truncatedDiff)}</pre>
         <a href="https://github.com/Oxygen-Low/Local.LLM/commit/${sha}" target="_blank" class="text-[10px] text-blue-400 hover:underline ml-2">View full file change</a>
       </details>`;
       } catch (diffErr) {
@@ -552,69 +572,69 @@ async function checkForUpdates() {
   if (updatePending || !AUTO_UPDATE) return;
 
   console.log("Checking for updates...");
-  exec("git fetch origin main", async (err) => {
-    if (err) {
-      console.error("Update check failed (fetch):", err);
-      return;
-    }
+  try {
+    await execFilePromise("git", ["fetch", "origin", "main"]);
 
-    exec("git rev-parse HEAD", async (err, stdoutHead) => {
-      if (err) {
-        console.error("Error getting local HEAD:", err);
+    const { stdout: stdoutHead } = await execFilePromise("git", [
+      "rev-parse",
+      "HEAD",
+    ]);
+    const local = stdoutHead.trim();
+
+    const { stdout: stdoutRemote } = await execFilePromise("git", [
+      "rev-parse",
+      "origin/main",
+    ]);
+    const remote = stdoutRemote.trim();
+
+    // Check if this remote SHA has failed before
+    try {
+      const failedResult = await pool.query(
+        "SELECT value FROM system_info WHERE key = 'failed_remote_sha'",
+      );
+      if (failedResult.rows[0]?.value === remote) {
+        console.log(`Skipping update as remote SHA ${remote} previously failed.`);
         return;
       }
-      const local = stdoutHead.trim();
+    } catch (dbErr) {
+      console.error("Error checking failed_remote_sha:", dbErr);
+    }
 
-      exec("git rev-parse origin/main", async (err, stdoutRemote) => {
-        if (err) {
-          console.error("Error getting origin/main HEAD:", err);
-          return;
-        }
-        const remote = stdoutRemote.trim();
+    // If local and remote differ, an update is available
+    if (local !== remote) {
+      console.log(`Update detected! Local: ${local}, Remote: ${remote}`);
+      updatePending = true;
+      pendingRemoteSha = remote;
+      restartAt = Date.now() + AUTO_UPDATE_WAIT * 1000;
 
-        // Check if this remote SHA has failed before
+      // Attempt to get the new version from the remote version.txt
+      try {
+        const { stdout: stdoutVersion } = await execFilePromise("git", [
+          "show",
+          "origin/main:version.txt",
+        ]);
+        updateVersion = stdoutVersion.trim();
+        console.log(`Update Version: ${updateVersion}`);
+      } catch (err) {
+        // Fallback for transition period
         try {
-          const failedResult = await pool.query(
-            "SELECT value FROM system_info WHERE key = 'failed_remote_sha'",
-          );
-          if (failedResult.rows[0]?.value === remote) {
-            console.log(`Skipping update as remote SHA ${remote} previously failed.`);
-            return;
-          }
-        } catch (dbErr) {
-          console.error("Error checking failed_remote_sha:", dbErr);
+          const { stdout: stdoutCh } = await execFilePromise("git", [
+            "show",
+            "origin/main:changelogs.md",
+          ]);
+          updateVersion = stdoutCh.split("\n")[0].trim();
+        } catch (err2) {
+          updateVersion = "Unknown";
         }
+        console.log(`Update Version: ${updateVersion}`);
+      }
 
-        // If local and remote differ, an update is available
-        if (local !== remote) {
-          console.log(`Update detected! Local: ${local}, Remote: ${remote}`);
-          updatePending = true;
-          pendingRemoteSha = remote;
-          restartAt = Date.now() + AUTO_UPDATE_WAIT * 1000;
-
-          // Attempt to get the new version from the remote version.txt
-          exec("git show origin/main:version.txt", (err, stdoutVersion) => {
-            if (!err) {
-              updateVersion = stdoutVersion.trim();
-            } else {
-              // Fallback for transition period
-              exec("git show origin/main:changelogs.md", (err2, stdoutCh) => {
-                if (!err2) {
-                  updateVersion = stdoutCh.split("\n")[0].trim();
-                } else {
-                  updateVersion = "Unknown";
-                }
-              });
-            }
-            console.log(`Update Version: ${updateVersion}`);
-          });
-
-          // Schedule the pull and restart
-          setTimeout(performUpdate, AUTO_UPDATE_WAIT * 1000);
-        }
-      });
-    });
-  });
+      // Schedule the pull and restart
+      setTimeout(performUpdate, AUTO_UPDATE_WAIT * 1000);
+    }
+  } catch (err) {
+    console.error("Update check failed:", err);
+  }
 }
 
 /**
@@ -627,35 +647,23 @@ async function performUpdate() {
 
   let origHead = "HEAD";
   try {
-    const { stdout } = await execPromise("git rev-parse HEAD");
+    const { stdout } = await execFilePromise("git", ["rev-parse", "HEAD"]);
     origHead = stdout.trim();
   } catch (err) {
     console.error("Failed to get ORIG_HEAD:", err);
   }
 
-  exec("git pull origin main", async (err) => {
-    if (err) {
-      console.error("Git pull failed:", err);
-      if (pendingRemoteSha) {
-        try {
-          await pool.query(
-            "INSERT INTO system_info (key, value) VALUES ('failed_remote_sha', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
-            [pendingRemoteSha],
-          );
-        } catch (dbErr) {
-          console.error("Failed to store failed_remote_sha:", dbErr);
-        }
-      }
-      updatePending = false;
-      pendingRemoteSha = null;
-      return;
-    }
+  try {
+    await execFilePromise("git", ["pull", "origin", "main"]);
 
     // Handle changelog generation
     try {
-      const { stdout: diffFiles } = await execPromise(
-        `git diff --name-only ${origHead} HEAD`,
-      );
+      const { stdout: diffFiles } = await execFilePromise("git", [
+        "diff",
+        "--name-only",
+        origHead,
+        "HEAD",
+      ]);
       const files = diffFiles.split("\n");
       const versionChanged = files.includes("version.txt");
 
@@ -664,9 +672,12 @@ async function performUpdate() {
         fs.writeFileSync(changelogPath, "");
       }
 
-      const { stdout: commits } = await execPromise(
-        `git log ${origHead}..HEAD --reverse --pretty=format:%H`,
-      );
+      const { stdout: commits } = await execFilePromise("git", [
+        "log",
+        `${origHead}..HEAD`,
+        "--reverse",
+        "--pretty=format:%H",
+      ]);
       const shas = commits
         .trim()
         .split("\n")
@@ -697,7 +708,21 @@ async function performUpdate() {
     }
 
     triggerRestart();
-  });
+  } catch (err) {
+    console.error("Git pull failed:", err);
+    if (pendingRemoteSha) {
+      try {
+        await pool.query(
+          "INSERT INTO system_info (key, value) VALUES ('failed_remote_sha', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
+          [pendingRemoteSha],
+        );
+      } catch (dbErr) {
+        console.error("Failed to store failed_remote_sha:", dbErr);
+      }
+    }
+    updatePending = false;
+    pendingRemoteSha = null;
+  }
 }
 
 /**
