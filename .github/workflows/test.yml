@@ -43,15 +43,7 @@ jobs:
 
       - name: Start backend
         run: |
-          cat <<EOF > .env
-          DB_USER=user
-          DB_PASSWORD=password
-          DB_HOST=localhost
-          DB_NAME=localllm
-          DB_PORT=5432
-          SESSION_SECRET=a-very-long-and-secure-session-secret-at-least-32-chars
-          PORT=3000
-          EOF
+          cp .test.env .env
           node server.js &
 
       - name: Build website
