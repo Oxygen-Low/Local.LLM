@@ -1,4 +1,5 @@
 # Local.LLM
+[![test](https://github.com/Oxygen-Low/Local.LLM/actions/workflows/test.yml/badge.svg)](https://github.com/Oxygen-Low/Local.LLM/actions/workflows/test.yml)
 - Chat and develop with your favourite characters!
 
 Local.LLM is a community focused ai platform that provides tools for almost anyone.
