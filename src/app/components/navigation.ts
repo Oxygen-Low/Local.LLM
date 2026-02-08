@@ -69,10 +69,15 @@ import { AuthService } from "../services/auth.service";
       </div>
 
       <!-- User Menu -->
-      <div class="px-4 py-6">
+      <div class="px-4 py-6 relative">
         <button
+          (click)="userMenuOpen.set(!userMenuOpen())"
+          [attr.aria-expanded]="userMenuOpen()"
+          aria-haspopup="true"
           aria-label="User menu"
-          class="w-full flex items-center justify-center p-3 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-700 transition-colors duration-200"
+          class="w-full flex items-center justify-center p-3 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-700 transition-colors duration-200 relative z-20"
+          [class.bg-gray-900]="userMenuOpen()"
+          [class.text-white]="userMenuOpen()"
         >
           <svg
             class="h-6 w-6"
@@ -89,6 +94,49 @@ import { AuthService } from "../services/auth.service";
             />
           </svg>
         </button>
+
+        @if (userMenuOpen()) {
+          <div
+            (click)="userMenuOpen.set(false)"
+            class="fixed inset-0 z-10 cursor-default"
+          ></div>
+          <div
+            class="absolute bottom-full left-4 w-56 mb-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden z-20"
+          >
+            <div class="px-4 py-3 border-b border-gray-700">
+              <p class="text-sm text-white font-medium truncate">
+                {{ authService.currentUser()?.username }}
+              </p>
+            </div>
+            <a
+              routerLink="/settings"
+              (click)="userMenuOpen.set(false)"
+              class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+            >
+              Settings
+            </a>
+            <button
+              (click)="logout()"
+              class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+              Sign out
+            </button>
+          </div>
+        }
       </div>
 
       <!-- Mobile Close Button -->
@@ -152,6 +200,7 @@ import { AuthService } from "../services/auth.service";
 export class NavigationComponent implements OnInit {
   sidebarOpen = signal(false);
   isMobile = signal(false);
+  userMenuOpen = signal(false);
 
   constructor(public authService: AuthService) {}
 
@@ -166,5 +215,10 @@ export class NavigationComponent implements OnInit {
 
   private updateIsMobile() {
     this.isMobile.set(window.innerWidth < 768);
+  }
+
+  logout() {
+    this.authService.logout();
+    this.userMenuOpen.set(false);
   }
 }
