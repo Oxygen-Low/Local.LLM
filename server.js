@@ -29,6 +29,13 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
+if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+  console.error(
+    "CRITICAL: Admin environment variables (ADMIN_USERNAME, ADMIN_PASSWORD) must both be defined.",
+  );
+  process.exit(1);
+}
+
 // Auto-update state
 let updatePending = false;
 let restartAt = null;
@@ -258,28 +265,20 @@ async function initDb() {
 
 /**
  * Checks if the configured ADMIN_USERNAME exists in the database.
- * If not, and if ADMIN_PASSWORD is provided, it creates the admin user.
+ * If not, it creates the admin user using ADMIN_PASSWORD.
  */
 async function seedAdmin() {
-  if (!ADMIN_USERNAME) return;
-
   try {
     const res = await pool.query("SELECT * FROM users WHERE username = $1", [
       ADMIN_USERNAME,
     ]);
     if (res.rows.length === 0) {
-      if (ADMIN_PASSWORD) {
-        const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
-        await pool.query(
-          "INSERT INTO users (username, password) VALUES ($1, $2)",
-          [ADMIN_USERNAME, hashedPassword],
-        );
-        console.log("Admin account created using ADMIN_PASSWORD.");
-      } else {
-        console.log(
-          "NOTICE: ADMIN_USERNAME is set but ADMIN_PASSWORD is not set. Admin account was NOT seeded. Public registration for this username is blocked.",
-        );
-      }
+      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      await pool.query(
+        "INSERT INTO users (username, password) VALUES ($1, $2)",
+        [ADMIN_USERNAME, hashedPassword],
+      );
+      console.log("Admin account created using ADMIN_PASSWORD.");
     } else {
       console.log("Admin account already exists.");
     }
